@@ -82,9 +82,10 @@
   function judge(q, raw) {
     let n = norm(raw);
     if (!n) return null;
-    n = ALIAS[n] || n;
     const list = entries(q);
-    const exact = list.find((e) => e.keys.includes(n));
+    // Exact name first (so "England" counts where England is an answer), then common aliases.
+    const exact = list.find((e) => e.keys.includes(n)) || list.find((e) => e.keys.includes(ALIAS[n]));
+    n = ALIAS[n] || n;
     if (exact) return { ...exact, fuzzy: false };
     if (KNOWN.has(n)) return { tier: -1 }; // a real place, just not on this route
     let best = null, bestD = 99;

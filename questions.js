@@ -275,6 +275,247 @@ const QUESTIONS = [
         ["Guatemala"],
         [],
         ["Belize"]] },
+
+  // ---------- Batch 2 ----------
+  { q: "Name a country that borders Poland.",
+    a: [["Germany", "Ukraine"], ["Czechia", "Belarus"], ["Slovakia", "Lithuania"], ["Russia"]] },
+
+  { q: "Name a country that borders Switzerland.",
+    a: [["Germany", "France", "Italy"], ["Austria"], [], ["Liechtenstein"]] },
+
+  { q: "Name a country that borders Italy.",
+    a: [["France", "Switzerland"], ["Austria"], ["Slovenia"], ["San Marino", ["Vatican City", "Vatican", "Holy See"]]] },
+
+  { q: "Name a country that borders Iran.",
+    a: [["Iraq", "Afghanistan"], ["Pakistan", "Turkey"], ["Turkmenistan"], ["Armenia", "Azerbaijan"]] },
+
+  { q: "Name a country that borders Afghanistan.",
+    a: [["Pakistan", "Iran"], ["China"], ["Tajikistan", "Uzbekistan"], ["Turkmenistan"]] },
+
+  { q: "Name a country that borders Kenya.",
+    a: [["Tanzania"], ["Uganda", "Ethiopia", "Somalia"], ["South Sudan"], []] },
+
+  { q: "Name a country that borders South Africa.",
+    a: [["Namibia", "Botswana", "Zimbabwe"], ["Mozambique"], ["Lesotho"], ["Eswatini"]] },
+
+  { q: "Name a country (or territory) that borders Egypt.",
+    a: [["Libya", "Israel"], ["Sudan"], [], [["Palestine", "Gaza", "Gaza Strip"]]] },
+
+  { q: "Name a country that borders Peru.",
+    a: [["Chile", "Bolivia"], ["Ecuador", "Brazil"], ["Colombia"], []] },
+
+  { q: "Name a country that borders Colombia.",
+    a: [["Venezuela", "Ecuador"], ["Brazil", "Panama"], ["Peru"], []] },
+
+  { q: "Name a country that borders Vietnam.",
+    a: [["China"], ["Cambodia"], ["Laos"], []] },
+
+  { q: "Name a country that borders Thailand.",
+    a: [["Cambodia"], ["Laos", "Malaysia"], ["Myanmar"], []] },
+
+  { q: "Name a country that borders Ukraine.",
+    a: [["Russia", "Poland"], ["Belarus", "Romania"], ["Hungary", "Moldova"], ["Slovakia"]] },
+
+  { q: "Name a country that borders Hungary.",
+    a: [["Austria", "Romania"], ["Slovakia", "Serbia"], ["Croatia", "Ukraine"], ["Slovenia"]] },
+
+  { q: "Name a country that borders Serbia.",
+    a: [["Croatia", "Hungary", "Bosnia and Herzegovina"], ["Romania", "Bulgaria", "Kosovo"], ["Montenegro"], ["North Macedonia"]] },
+
+  { q: "Name a country that borders Nigeria.",
+    a: [["Niger", "Cameroon"], ["Chad"], ["Benin"], []] },
+
+  { q: "Name a country that borders Ethiopia.",
+    a: [["Somalia", "Kenya"], ["Eritrea", "Sudan"], ["Djibouti", "South Sudan"], []] },
+
+  { q: "Name a country that borders Libya.",
+    a: [["Egypt", "Tunisia"], ["Algeria"], ["Chad", "Sudan"], ["Niger"]] },
+
+  { q: "Name a country (or territory) that borders Algeria.",
+    a: [["Morocco", "Tunisia", "Libya"], ["Mali", "Niger"], ["Mauritania"], ["Western Sahara"]] },
+
+  { q: "Name a country that borders Kazakhstan.",
+    a: [["Russia", "China"], ["Uzbekistan"], ["Kyrgyzstan"], ["Turkmenistan"]] },
+
+  { q: "Name a country that borders Pakistan.",
+    a: [["India", "Afghanistan"], ["Iran"], ["China"], []] },
+
+  { q: "Name a country that shares a land border with Canada. (There's a sneaky one!)",
+    a: [["United States"], [], [], [["Denmark", "Greenland"]]] },
+
+  { q: "Name a country that borders Chile.",
+    a: [["Argentina"], ["Peru"], ["Bolivia"], []] },
+
+  { q: "Name a country that borders Bolivia.",
+    a: [["Peru", "Brazil"], ["Argentina", "Chile"], ["Paraguay"], []] },
+
+  { q: "Name a country that borders Guatemala.",
+    a: [["Mexico"], ["Honduras"], ["Belize", "El Salvador"], []] },
+
+  { q: "Name a country that borders North Korea.",
+    a: [["South Korea", "China"], [], ["Russia"], []] },
+
+  { q: "Name a country (or territory) that borders Israel.",
+    a: [["Egypt", "Jordan"], ["Lebanon", "Syria"], [["Palestine", "West Bank", "Gaza", "Gaza Strip"]], []] },
+
+  { q: "Name a country that borders Iraq.",
+    a: [["Iran", "Syria"], ["Turkey", "Saudi Arabia", "Kuwait"], ["Jordan"], []] },
+
+  { q: "Name a US state that borders Texas.",
+    a: [["Oklahoma", "New Mexico"], ["Louisiana"], ["Arkansas"], []] },
+
+  { q: "Name a US state that borders California.",
+    a: [["Nevada", "Oregon"], ["Arizona"], [], []] },
+
+  { q: "Name a US state that borders Tennessee.",
+    a: [["Kentucky", "Georgia", "Alabama"], ["North Carolina", "Mississippi", "Virginia"], ["Arkansas"], ["Missouri"]] },
+
+  { q: "Name a US state that borders Missouri.",
+    a: [["Kansas", "Illinois", "Iowa"], ["Arkansas", "Oklahoma", "Nebraska"], ["Tennessee"], ["Kentucky"]] },
+
+  { q: "Name a US state that touches Colorado (corners count!).",
+    a: [["Utah", "Wyoming"], ["Kansas", "New Mexico", "Nebraska"], ["Oklahoma"], ["Arizona"]] },
+
+  { q: "Name a US state that starts with the letter I.",
+    a: [["Illinois", "Iowa"], ["Indiana"], ["Idaho"], []] },
+
+  { q: "Name a US state that starts with the letter A.",
+    a: [["Alabama", "Alaska"], ["Arizona"], ["Arkansas"], []] },
+
+  { q: "Name a US state that starts with the letter C.",
+    a: [["California"], ["Colorado"], ["Connecticut"], []] },
+
+  { q: "Name a New England state.",
+    a: [["Massachusetts", "Maine"], ["Vermont", "Connecticut"], ["New Hampshire"], ["Rhode Island"]] },
+
+  { q: "Name a US state that was one of the original 13 colonies.",
+    a: [["Virginia", "Massachusetts", "New York"],
+        ["Pennsylvania", "New Jersey", "Maryland"],
+        ["Connecticut", "North Carolina", "South Carolina", "New Hampshire"],
+        ["Rhode Island", "Delaware", "Georgia"]] },
+
+  { q: "Name a US state with an Atlantic Ocean coastline.",
+    a: [["Florida", "New York", "Maine"],
+        ["North Carolina", "Massachusetts", "New Jersey", "South Carolina", "Virginia"],
+        ["Georgia", "Maryland", "Connecticut", "Delaware"],
+        ["Rhode Island", "New Hampshire"]] },
+
+  { q: "Name one of the Four Corners states.",
+    a: [["Arizona", "Colorado"], ["Utah"], ["New Mexico"], []] },
+
+  { q: "Name one of the four countries that make up the United Kingdom.",
+    a: [["England", "Scotland"], ["Wales"], [["Northern Ireland", "N Ireland", "Ulster"]], []] },
+
+  { q: "Name a country where German is an official language.",
+    a: [["Germany", "Austria"], ["Switzerland"], ["Liechtenstein"], ["Luxembourg", "Belgium"]] },
+
+  { q: "Name a country where Arabic is an official language.",
+    a: [["Saudi Arabia", "Egypt", "Iraq", "United Arab Emirates"],
+        ["Morocco", "Jordan", "Syria", "Lebanon", "Kuwait", "Qatar", "Yemen", "Oman"],
+        ["Algeria", "Tunisia", "Libya", "Sudan", "Bahrain", "Palestine"],
+        ["Mauritania", "Somalia", "Djibouti", "Comoros", "Chad"]] },
+
+  { q: "Name a country in Oceania.",
+    a: [["Australia", "New Zealand"],
+        ["Fiji", "Papua New Guinea"],
+        ["Samoa", "Tonga", "Solomon Islands", "Vanuatu"],
+        ["Kiribati", "Micronesia", "Marshall Islands", "Palau", "Tuvalu", "Nauru"]] },
+
+  { q: "Name an island country in the Indian Ocean.",
+    a: [["Madagascar", "Sri Lanka"], ["Maldives"], ["Mauritius", "Seychelles"], ["Comoros"]] },
+
+  { q: "Name a country (or territory) the Tropic of Cancer passes through.",
+    a: [["Mexico", "India", "Egypt"],
+        ["Saudi Arabia", "China", "Bahamas"],
+        ["Algeria", "Libya", "Oman", "Bangladesh", "Taiwan", "Myanmar"],
+        ["Mali", "Niger", "Mauritania", "United Arab Emirates", "Western Sahara"]] },
+
+  { q: "Name a country the Tropic of Capricorn passes through.",
+    a: [["Australia", "Brazil"],
+        ["Chile", "Argentina", "South Africa", "Madagascar"],
+        ["Paraguay", "Namibia", "Mozambique", "Botswana"],
+        []] },
+
+  { q: "Name a country the Arctic Circle passes through.",
+    a: [["Russia", "Canada", "Norway"], ["Sweden", "Finland", "United States"], [["Denmark", "Greenland"]], ["Iceland"]] },
+
+  { q: "Name a G7 country.",
+    a: [["United States", "United Kingdom", "Japan"], ["Germany", "France"], ["Canada"], ["Italy"]] },
+
+  { q: "Name a country that has hosted the Summer Olympics.",
+    a: [["United States", "China", "United Kingdom", "Greece"],
+        ["Japan", "Australia", "France", "Brazil", "Spain"],
+        ["Germany", "Mexico", "Canada", "Italy", "South Korea", ["Russia", "Soviet Union", "USSR"]],
+        ["Sweden", "Belgium", "Netherlands", "Finland"]] },
+
+  { q: "Name a capital city in South America.",
+    a: [["Buenos Aires", "Lima", "Santiago", "Bogota"],
+        ["Brasilia", "Caracas", "Quito"],
+        ["Montevideo", "La Paz", "Asuncion"],
+        ["Sucre", "Georgetown", "Paramaribo", "Cayenne"]] },
+
+  { q: "Name a Nordic capital city.",
+    a: [["Stockholm", "Oslo"], ["Copenhagen"], ["Helsinki"], ["Reykjavik", "Nuuk", "Torshavn", "Mariehamn"]] },
+
+  { q: "Name an Australian state or territory capital.",
+    a: [["Sydney", "Melbourne"], ["Brisbane", "Perth"], ["Adelaide", "Canberra"], ["Hobart", "Darwin"]] },
+
+  { q: "Name a Canadian provincial or territorial capital.",
+    a: [["Toronto", ["Quebec City", "Quebec"], "Victoria"],
+        ["Edmonton", "Winnipeg", "Halifax"],
+        ["Regina", "Fredericton", "St. John's"],
+        ["Charlottetown", "Whitehorse", "Yellowknife", "Iqaluit"]] },
+
+  { q: "Name a European country that has a monarch.",
+    a: [["United Kingdom", "Spain"],
+        ["Sweden", "Norway", "Netherlands", "Denmark", "Belgium"],
+        ["Monaco"],
+        ["Liechtenstein", "Luxembourg", "Andorra", ["Vatican City", "Vatican", "Holy See"]]] },
+
+  { q: "Name a country (or territory) the Amazon rainforest extends into.",
+    a: [["Brazil"], ["Peru", "Colombia"], ["Ecuador", "Bolivia", "Venezuela"], ["Guyana", "Suriname", ["French Guiana", "France"]]] },
+
+  { q: "Name a country the Mekong River flows through.",
+    a: [["Vietnam", "Cambodia"], ["Laos", "Thailand"], ["China"], ["Myanmar"]] },
+
+  { q: "Name a country the Rhine River flows through or borders.",
+    a: [["Germany"], ["Netherlands", "Switzerland"], ["France"], ["Austria", "Liechtenstein"]] },
+
+  { q: "Name a country the Himalayas extend into.",
+    a: [["Nepal", "India"], ["China", "Bhutan"], ["Pakistan"], []] },
+
+  { q: "Name a country (or territory) the Sahara Desert extends into.",
+    a: [["Egypt", "Morocco", "Algeria", "Libya"], ["Mali", "Niger", "Chad", "Sudan"], ["Mauritania", "Tunisia"], ["Western Sahara"]] },
+
+  { q: "Name one of the seven continents.",
+    a: [["Asia", "Africa", "Europe"], ["North America", "South America"], [["Australia", "Oceania"]], ["Antarctica"]] },
+
+  { q: "Name one of the world's five oceans.",
+    a: [[["Pacific", "Pacific Ocean"], ["Atlantic", "Atlantic Ocean"]], [["Indian", "Indian Ocean"]], [["Arctic", "Arctic Ocean"]], [["Southern", "Southern Ocean", "Antarctic", "Antarctic Ocean"]]] },
+
+  { q: "Name a country with a coastline on the Persian Gulf.",
+    a: [["Iran", "Saudi Arabia"], ["Kuwait", "Qatar", "United Arab Emirates"], ["Iraq", "Bahrain"], ["Oman"]] },
+
+  { q: "Name a country with a coastline on the Adriatic Sea.",
+    a: [["Italy", "Croatia"], ["Albania"], ["Montenegro", "Slovenia"], ["Bosnia and Herzegovina"]] },
+
+  { q: "Name a country with a shoreline on Lake Victoria.",
+    a: [["Uganda", "Tanzania"], ["Kenya"], [], []] },
+
+  { q: "Name a country with \"Guinea\" in its name.",
+    a: [["Papua New Guinea"], ["Guinea", "Equatorial Guinea"], ["Guinea-Bissau"], []] },
+
+  { q: "Name a country whose English name ends in \"-land\".",
+    a: [["Poland", "Ireland", "Finland"], ["Switzerland", "Iceland", "New Zealand"], ["Thailand"], []] },
+
+  { q: "Name a country that shares a land border with exactly one other country.",
+    a: [["Portugal", "Ireland", "Haiti", "Dominican Republic", "South Korea"],
+        ["Monaco", "San Marino", ["Vatican City", "Vatican", "Holy See"], "Lesotho"],
+        ["Gambia", "Qatar", "Brunei"],
+        ["East Timor", "Papua New Guinea"]] },
+
+  { q: "Name a country the Prime Meridian (0° longitude) passes through.",
+    a: [["United Kingdom"], ["France", "Spain"], ["Algeria", "Ghana", "Mali"], ["Burkina Faso", "Togo"]] },
 ];
 
 // Different spellings that mean the same place. Keys and values are compared
@@ -315,6 +556,8 @@ const ALIASES = {
   "kirghizia": "kyrgyzstan", "kyrgyz republic": "kyrgyzstan",
   "turkiye": "turkey",
   "macedonia": "north macedonia",
+  "vatican": "vatican city", "holy see": "vatican city",
+  "st johns": "st. john's", "saint johns": "st. john's",
 };
 
 // Real climbing areas around the world — one is "today's crag".
