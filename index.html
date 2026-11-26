@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crux · Daily Geography Climb</title>
+  <meta name="description" content="A daily geography trivia climb. Rarer right answers are harder holds — and take you higher.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧗</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <span class="logo">CRUX</span>
+        <span class="tag">daily geography climb</span>
+      </div>
+      <button class="icon-btn" id="helpBtn" aria-label="How to play">?</button>
+    </header>
+
+    <section class="crag" id="crag"></section>
+
+    <section class="wall-wrap">
+      <svg id="wall" viewBox="0 0 320 220" role="img" aria-label="Climbing wall showing your progress"></svg>
+      <div class="altimeter">
+        <span class="alt-label">height</span>
+        <span class="alt-value" id="altValue">0 m</span>
+      </div>
+    </section>
+
+    <main id="play"></main>
+
+    <footer class="foot">A new route every day at midnight · <span id="stats"></span></footer>
+  </div>
+
+  <dialog id="help">
+    <h2>How to climb</h2>
+    <p>Every day there's a new route with <b>7 geography questions</b>. Each one has many right answers — you get one try per question.</p>
+    <p>The <b>less common</b> your right answer, the harder the hold you grabbed and the <b>higher you climb</b>:</p>
+    <ul class="legend">
+      <li><span class="dot g0"></span><b>Jug</b> · 5.7 · the answer most people give · +100 m</li>
+      <li><span class="dot g1"></span><b>Edge</b> · 5.10 · good thinking · +200 m</li>
+      <li><span class="dot g2"></span><b>Crimp</b> · 5.12 · not many people think of it · +300 m</li>
+      <li><span class="dot g3"></span><b>Mono</b> · 5.14 · a deep cut! · +400 m</li>
+      <li><span class="dot gx"></span><b>Slip</b> · not a right answer · +0 m</li>
+    </ul>
+    <p>Small typos are fine. Climb all 7 perfectly with Monos to top out at <b>2,800 m</b>.</p>
+    <form method="dialog"><button class="btn">Let's climb</button></form>
+  </dialog>
+
+  <script src="questions.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
