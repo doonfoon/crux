@@ -86,6 +86,13 @@ body {
   color: var(--ink); font: 700 16px var(--display); cursor: pointer; transition: transform .15s, background .15s;
 }
 .icon-btn:hover { transform: rotate(12deg); background: var(--card-2); }
+.sound-btn { display: grid; place-items: center; padding: 0; }
+.sound-btn svg { width: 19px; height: 19px; fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sound-btn .spk { fill: var(--ink); }
+.sound-btn .mute { display: none; stroke: var(--danger); }
+.sound-btn.off .waves { display: none; }
+.sound-btn.off .mute { display: inline; }
+.sound-btn.off .spk { fill: var(--ink-3); stroke: var(--ink-3); }
 
 /* ---------- crag sign ---------- */
 .sign {

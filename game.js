@@ -242,6 +242,7 @@
 
     const finish = (raw, timedOut) => {
       clearInterval(timer); timer = null;
+      SFX.play(timedOut ? "buzzer" : "submit");
       const r = timedOut ? { tier: -1 } : judge(q, raw);
       state.answers.push({ input: raw, display: r.display || raw, tier: r.tier, fuzzy: !!r.fuzzy, timeout: timedOut });
       delete state.clock;
@@ -266,6 +267,7 @@
         ring.classList.toggle("urgent", secs <= 10);
         card.classList.toggle("urgent", secs <= 10);
         if (secs <= 5 && secs > 0 && !FX.reduced) num.animate([{ transform: "scale(1.35)" }, { transform: "scale(1)" }], { duration: 300, easing: "ease-out" });
+        if (secs <= 5 && secs > 0 && left < SECONDS * 1000 - 500) SFX.play("tick", secs <= 2);
       }
       if (left <= 0) finish(input.value.trim(), true);
     };
@@ -342,7 +344,7 @@
           <button class="btn wide" id="nextBtn">${last ? "See your climb" : "Next move"} <span aria-hidden="true">→</span></button>
         </div>
       </div>`;
-    document.getElementById("nextBtn").addEventListener("click", () => { viewing = null; render(); });
+    document.getElementById("nextBtn").addEventListener("click", () => { SFX.play("click"); viewing = null; render(); });
     const mapBox = document.getElementById("mapBox");
     if (mapBox) MapReveal.render(mapBox, { entries: entries(q), mode: mapMode(q), you: hit ? a.display : null, norm, geo: GEO_N });
   }
@@ -408,8 +410,9 @@
     if (isToday) tick();
     if (celebrate) {
       celebrate = false;
-      if (m >= MAX_M) { FX.flash("#fff", 600); Scene.stamp("Summit!", "t3"); FX.confetti({ count: 220 }); }
-      else if (m >= 1400) FX.confetti({ count: m >= 2200 ? 170 : 90 });
+      if (m >= MAX_M) { FX.flash("#fff", 600); Scene.stamp("Summit!", "t3"); FX.confetti({ count: 220 }); SFX.play("summit"); }
+      else if (m >= 1400) { FX.confetti({ count: m >= 2200 ? 170 : 90 }); SFX.play("finale"); }
+      else SFX.play("finaleSmall");
     }
   }
 
@@ -489,7 +492,16 @@
     stamp: document.getElementById("stamp"), crag, maxM: MAX_M, seed: day + 1,
   });
   const help = document.getElementById("help");
-  document.getElementById("helpBtn").addEventListener("click", () => help.showModal());
+  document.getElementById("helpBtn").addEventListener("click", () => { SFX.play("click"); help.showModal(); });
+  const soundBtn = document.getElementById("soundBtn");
+  const paintSound = () => {
+    soundBtn.classList.toggle("off", !SFX.on);
+    soundBtn.setAttribute("aria-pressed", String(SFX.on));
+    soundBtn.setAttribute("aria-label", SFX.on ? "Sound on — tap to mute" : "Sound off — tap to turn on");
+    soundBtn.title = SFX.on ? "Mute sounds" : "Turn sounds on";
+  };
+  soundBtn.addEventListener("click", () => { SFX.setOn(!SFX.on); paintSound(); });
+  paintSound();
   if (!store.get("crux-seen-help", false)) { store.set("crux-seen-help", true); help.showModal(); }
   showStats();
   render();

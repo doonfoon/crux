@@ -18,6 +18,7 @@ answers, and **rarer right answers are harder holds that climb you higher**.
 - `scene.js` – the illustrated climbing wall and the move animations
 - `fx.js` – confetti, sparks, chalk puffs and the hold drawings
 - `map.js` – the map reveal after each move
+- `sfx.js` – sound effects, made live by the browser (no sound files)
 - `geo.js` – map coordinates for cities, mountains, lakes and tiny countries
 - `questions.js` – **the question bank** (edit this to add questions or change how rare an answer is)
 

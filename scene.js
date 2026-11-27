@@ -347,6 +347,7 @@
       this.drawRoute(prev);
       this.placeClimber(from);
       if (FX.reduced) {
+        if (!to.hit && window.SFX) SFX.play("slip");
         this.drawRoute(pts); this.placeClimber(to); onLand && onLand();
         if (to.hit) this.reveal(pts.length - 1, to);
         return;
@@ -381,6 +382,7 @@
     },
 
     async chip(from, to) {
+      if (window.SFX) SFX.play("riser");
       this.spotHole.setAttribute("cx", to.x);
       this.spotHole.setAttribute("cy", to.y + 6);
       this.spot.animate([{ opacity: 0 }, { opacity: 0.55 }], { duration: 380, fill: "forwards" });
@@ -400,6 +402,7 @@
     },
 
     async slip(p, timeout) {
+      if (window.SFX) SFX.play("slip");
       const feet = this.screenOf(p.x - 2, p.y + 40);
       FX.burst(feet.x, feet.y, { count: 10, colors: ["#8b8478", "#a39a8c", "#6e675d"], shapes: ["rect"], speed: [30, 140], angle: Math.PI / 2, spread: 1.6, g: 900, life: [0.8, 1.3], size: [3, 5] });
       FX.vibrate(60);
@@ -424,6 +427,7 @@
       if (!node) return;
       const s = this.screenOf(p.x + 1, p.y + 3);
       const plus = `+${HOLD_M[p.tier]} m`;
+      if (window.SFX) SFX.play(["jug", "sloper", "crimp", "chip"][p.tier]);
       if (FX.reduced) { this.floatText(p, plus, p.tier); return; }
       switch (p.tier) {
         case 0:
