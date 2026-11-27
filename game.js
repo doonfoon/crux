@@ -38,20 +38,77 @@
     for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
     return a;
   }
-  // Each kind of question has its own pool, walked in shuffled cycles so nothing repeats until the pool runs out.
-  const POOLS = { flag: [], nature: [], city: [], other: [] };
-  QUESTIONS.forEach((q, i) => (POOLS[q.cat] || POOLS.other).push(i));
-  const cyc = (pool, k, salt) => shuffled(pool, salt + Math.floor(k / pool.length))[k % pool.length];
-  function questionsForDay(d) {
-    const r = rng(5000 + d), picked = [];
-    // Most days (not all) get a flag, a nature and a city question for variety.
-    [["flag", 101], ["nature", 202], ["city", 303]].forEach(([c, salt]) => { if (r() < 0.8) picked.push(cyc(POOLS[c], d, salt)); });
-    for (let k = d * MOVES; picked.length < MOVES; k++) {
-      const q = cyc(POOLS.other, k, 404);
-      if (!picked.includes(q)) picked.push(q);
-    }
-    return shuffled(picked, 777 + d);
+  // ---------- the daily schedule ----------
+  // Every question gets a topic, so one day never has two of the same kind (e.g. two Olympics questions).
+  function topicOf(q) {
+    const t = q.q;
+    if (/Olympics/.test(t)) return "olympics";
+    if (/capital/i.test(t)) return "capitals";
+    if (/US state|New England|Four Corners/.test(t)) return "us-states";
+    if (/borders|land border|touches only|touches Colorado/.test(t)) return "borders";
+    if (/official language/.test(t)) return "languages";
+    if (/starts with the letter|ends in|"Guinea"/.test(t)) return "spelling";
+    if (/Equator|Tropic|Arctic Circle|Prime Meridian/.test(t)) return "lines";
+    if (/\briver\b/i.test(t)) return "rivers";
+    if (/coastline|shoreline|\bsea\b|Gulf|\bocean/i.test(t)) return "seas";
+    if (/mountain|Alps|Andes|Himalayas|Summits/i.test(t)) return "mountains";
+    if (/\blakes?\b/i.test(t)) return "lakes";
+    if (/^Name a country in |island country|Central America|Southeast Asia|Oceania|Nordic|continents/.test(t)) return "regions";
+    if (/city in /.test(t)) return "cities";
+    if (q.cat === "flag") return "flags";
+    return t; // anything else is its own topic
   }
+  const TOPIC = QUESTIONS.map(topicOf);
+  const CAP = { borders: 2 }; // borders is a big topic and may appear twice a day; everything else once
+
+  // Route #1 was already being played when this schedule was introduced, so it is kept exactly as it was.
+  const ROUTE1 = ["Name a US state that starts with the letter I.", "Name a country that borders Chile.", "Name a river in South America.",
+    "Name a New England state.", "Name a country that borders Nigeria.", "Name a country whose flag has stars on a blue background.",
+    "Name a US state that borders Canada."].map((t) => QUESTIONS.findIndex((q) => q.q === t)).filter((i) => i >= 0);
+
+  // Walk day by day from route #1. Each category is a queue that is used up completely, in a shuffled order,
+  // before any question comes back. A question that would clash with today's topics just waits for a later day.
+  function buildSchedule(lastDay) {
+    const pools = { flag: [], nature: [], city: [], other: [] };
+    QUESTIONS.forEach((q, i) => (pools[q.cat] || pools.other).push(i));
+    const queues = {}, rounds = {};
+    for (const c in pools) { rounds[c] = 0; queues[c] = shuffled(pools[c], 9100 + c.length * 31); }
+    const refill = (c) => { rounds[c]++; queues[c].push(...shuffled(pools[c], 9100 + c.length * 31 + rounds[c] * 977)); };
+    // Priority: an unused question with a fresh topic → an unused question (even if the topic repeats)
+    // → only then start the next round. So nothing repeats until its whole category has been used.
+    const take = (c, picked, count) => {
+      const room = (x, extra) => !picked.includes(x) && (count[TOPIC[x]] || 0) < (CAP[TOPIC[x]] || 1) + extra;
+      for (let pass = 0; pass < 3; pass++) {
+        const q = queues[c];
+        let i = q.findIndex((x) => room(x, 0));        // fresh topic
+        if (i < 0) i = q.findIndex((x) => room(x, 1)); // at most one extra of a topic
+        if (i >= 0) return q.splice(i, 1)[0];
+        refill(c);
+      }
+      const q = queues[c], i = q.findIndex((x) => !picked.includes(x));
+      return i >= 0 ? q.splice(i, 1)[0] : null;
+    };
+    const used = (picked) => { const count = {}; picked.forEach((x) => { count[TOPIC[x]] = (count[TOPIC[x]] || 0) + 1; }); return count; };
+    const days = [];
+    // route #1: remove its questions from the queues
+    ROUTE1.forEach((x) => { const c = pools[QUESTIONS[x].cat] ? QUESTIONS[x].cat : "other"; const q = queues[c]; q.splice(q.indexOf(x), 1); });
+    days.push(ROUTE1);
+    for (let d = 1; d <= lastDay; d++) {
+      const r = rng(5000 + d), picked = [];
+      // Most days (not all) get a flag, a nature and a city question for variety.
+      ["flag", "nature", "city"].forEach((c) => {
+        if (r() < 0.8) { const x = take(c, picked, used(picked)); if (x !== null) picked.push(x); }
+      });
+      while (picked.length < MOVES) {
+        const x = take("other", picked, used(picked));
+        if (x === null) break;
+        picked.push(x);
+      }
+      days.push(shuffled(picked, 777 + d));
+    }
+    return days;
+  }
+  function questionsForDay(d) { return d <= 0 ? ROUTE1 : buildSchedule(d)[d]; }
   const qIds = questionsForDay(day);
   const crag = CRAGS[((day % CRAGS.length) + CRAGS.length) % CRAGS.length];
 
