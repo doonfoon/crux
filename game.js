@@ -47,7 +47,7 @@
     if (/\bstarts with\b|\bstarts and ends\b|\bends in\b|\bends with\b|letters long|in its name/.test(t)) return "wordplay";
     if (/US state|New England|Four Corners/.test(t)) return "us-states";
     if (/borders|land border|touches only|touches Colorado/.test(t)) return "borders";
-    if (/official language/.test(t)) return "languages";
+    if (/\blanguages?\b|\bspeak\b|\bspoken\b/.test(t)) return "languages";
     if (/Equator|Tropic|Arctic Circle|Prime Meridian/.test(t)) return "lines";
     if (/\briver\b/i.test(t)) return "rivers";
     if (/coastline|shoreline|\bsea\b|Gulf|\bocean/i.test(t)) return "seas";
@@ -181,6 +181,8 @@
     const name = esc(input);
     const text = esc(q.q.replace(/\s*\([^)]*\)/g, "").replace(/\s+\.$/, "."));
     const wantsState = /US state/.test(text), wantsCountry = /\bcountr(y|ies)\b/.test(text);
+    const lang = q.q.match(/^Name (?:an? |one of )(?:official )?language (?:spoken )?(?:in|of) (.+?)\.$/) || q.q.match(/^Name one of (.+?)'s (?:four )?official languages\.$/);
+    if (lang) return `${name} isn't one of the main languages of ${esc(lang[1])}.`;
     const isCountry = COUNTRY_SET.has(n), isState = STATE_SET.has(n), isPlace = !!GEO_N[n];
     if (!isCountry && !isState && !isPlace) {
       return `We couldn't find “${name}” among the right answers. Check the spelling — or it may just not fit this one.`;
