@@ -44,10 +44,10 @@
     const t = q.q;
     if (/Olympics/.test(t)) return "olympics";
     if (/capital/i.test(t)) return "capitals";
+    if (/\bstarts with\b|\bstarts and ends\b|\bends in\b|\bends with\b|letters long|in its name/.test(t)) return "wordplay";
     if (/US state|New England|Four Corners/.test(t)) return "us-states";
     if (/borders|land border|touches only|touches Colorado/.test(t)) return "borders";
     if (/official language/.test(t)) return "languages";
-    if (/starts with the letter|ends in|"Guinea"/.test(t)) return "spelling";
     if (/Equator|Tropic|Arctic Circle|Prime Meridian/.test(t)) return "lines";
     if (/\briver\b/i.test(t)) return "rivers";
     if (/coastline|shoreline|\bsea\b|Gulf|\bocean/i.test(t)) return "seas";
