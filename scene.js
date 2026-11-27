@@ -62,6 +62,7 @@
     },
 
     yFor(m) { return BASE - (m / this.maxM) * (BASE - TOP); },
+    marks() { return [1, 2, 3].map((k) => Math.round((k * this.maxM) / 400) * 100); }, // altitude lines at ¼, ½, ¾
     start() { return { x: CX - 6, y: BASE, tier: -1, hit: false }; },
 
     // Where each move lands on the wall (same every time for the same route).
@@ -181,13 +182,13 @@
       }
       // altitude marks
       const lineCol = dark ? "#ffffff" : "#ffffff";
-      [700, 1400, 2100].forEach((m) => {
+      this.marks().forEach((m) => {
         const y = this.yFor(m);
         el("line", { x1: 0, x2: W, y1: y, y2: y, stroke: lineCol, "stroke-width": 0.8, "stroke-dasharray": "2 5", opacity: dark ? 0.18 : 0.4 }, cliff);
       });
       el("path", { d: CLIFF_D, fill: "none", stroke: mix(shade, "#000000", 0.3), "stroke-width": 1.2, opacity: 0.55, "stroke-linejoin": "round" }, svg);
       const labels = el("g", { class: "alt-labels" }, svg);
-      [700, 1400, 2100].forEach((m) => {
+      this.marks().forEach((m) => {
         const y = this.yFor(m);
         el("rect", { x: 318, y: y - 6.5, width: 36, height: 13, rx: 6.5, class: "lbl-bg" }, labels);
         el("text", { x: 336, y: y + 3, "text-anchor": "middle", class: "lbl", text: `${m} m` }, labels);

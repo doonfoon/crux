@@ -1,6 +1,6 @@
 // CRUX — daily geography climb.
 (() => {
-  const MOVES = 7;
+  const ROUTE_LEN = 5; // questions per route (route #1 had 7)
   const SECONDS = 30; // time allowed per question
   const HOLDS = [
     { name: "Jug", m: 100, emoji: "🟩", title: "Clean grab!", blurb: "A big, friendly hold — a solid, popular answer.", delay: 0.5 },
@@ -9,11 +9,9 @@
     { name: "Foot Chip", m: 400, emoji: "🟪", title: "Crux move!", blurb: "A tiny hold almost nobody spots. Legendary.", delay: 1.9 },
   ];
   const SLIP = { emoji: "⬛" };
-  const MAX_M = MOVES * HOLDS[3].m;
-  const RANKS = [
-    [0, "Gumby"], [600, "Weekend Warrior"], [1000, "Crag Rat"],
-    [1400, "Crusher"], [1800, "Sender"], [2200, "Dirtbag Legend"], [2800, "Summit Seeker"],
-  ];
+  // Ranks are a share of the summit height, so they work for any route length.
+  const RANK_NAMES = [[0, "Bum"], [0.2, "Weekend Warrior"], [0.35, "Crag Rat"], [0.5, "Crusher"],
+    [0.65, "Sender"], [0.8, "Legend"], [1, "Summit Seeker"]];
 
   // ---------- storage (never required to work) ----------
   const store = {
@@ -28,6 +26,9 @@
   const param = parseInt(new URLSearchParams(location.search).get("route"), 10);
   const day = Number.isFinite(param) && param >= 1 && param - 1 <= today ? param - 1 : today;
   const isToday = day === today;
+  const MOVES = day === 0 ? 7 : ROUTE_LEN;           // route #1 was a 7-question route
+  const MAX_M = MOVES * HOLDS[3].m;                  // summit = a Foot Chip on every move
+  const RANKS = RANK_NAMES.map(([f, n]) => [Math.round((f * MAX_M) / 100) * 100, n]);
 
   function rng(seed) {
     let s = seed >>> 0;
@@ -105,11 +106,11 @@
     days.push(ROUTE1);
     for (let d = 1; d <= lastDay; d++) {
       const r = rng(5000 + d), picked = [];
-      // Most days (not all) get a flag, a nature and a city question for variety.
+      // Many days (not all) get a flag, a nature and/or a city question for variety.
       ["flag", "nature", "city"].forEach((c) => {
-        if (r() < 0.8) { const x = take(c, picked, used(picked)); if (x !== null) picked.push(x); }
+        if (r() < 0.65) { const x = take(c, picked, used(picked)); if (x !== null) picked.push(x); }
       });
-      while (picked.length < MOVES) {
+      while (picked.length < ROUTE_LEN) {
         const x = take("other", picked, used(picked));
         if (x === null) break;
         picked.push(x);
@@ -123,9 +124,12 @@
   const crag = CRAGS[((day % CRAGS.length) + CRAGS.length) % CRAGS.length];
 
   // ---------- answer matching ----------
-  const norm = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
-    .replace(/&/g, " and ").replace(/\bst\.?\s/g, "st ").replace(/[^a-z0-9]+/g, " ").trim()
-    .replace(/^the /, "");
+  // (a function declaration, so the daily schedule built earlier in this file can use it too)
+  function norm(s) {
+    return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
+      .replace(/&/g, " and ").replace(/\bst\.?\s/g, "st ").replace(/[^a-z0-9]+/g, " ").trim()
+      .replace(/^the /, "");
+  }
   const ALIAS = Object.fromEntries(Object.entries(ALIASES).map(([k, v]) => [norm(k), norm(v)]));
   const KNOWN = new Set(KNOWN_PLACES.map(norm));
   const GEO_N = Object.fromEntries(Object.entries(GEO).map(([k, v]) => [norm(k), v]));
@@ -480,7 +484,7 @@
     if (celebrate) {
       celebrate = false;
       if (m >= MAX_M) { FX.flash("#fff", 600); Scene.stamp("Summit!", "t3"); FX.confetti({ count: 220 }); SFX.play("summit"); }
-      else if (m >= 1400) { FX.confetti({ count: m >= 2200 ? 170 : 90 }); SFX.play("finale"); }
+      else if (m >= MAX_M * 0.5) { FX.confetti({ count: m >= MAX_M * 0.8 ? 170 : 90 }); SFX.play("finale"); }
       else SFX.play("finaleSmall");
     }
   }
