@@ -176,6 +176,11 @@ body {
 #wall .bel-helmet { fill: var(--jug); }
 #wall .cl-body { transform-origin: -4px 42px; animation: breathe 3.2s ease-in-out infinite; }
 @keyframes breathe { 50% { transform: translateY(-.6px) scaleY(1.015); } }
+#wall .climber.cheering .arm-l { transform-origin: -1.5px -27.5px; animation: cheerL .42s ease-in-out infinite alternate; }
+#wall .climber.cheering .arm-r { transform-origin: 1.5px -27.5px; animation: cheerR .42s ease-in-out infinite alternate; animation-delay: .21s; }
+@keyframes cheerL { from { transform: rotate(-14deg); } to { transform: rotate(16deg); } }
+@keyframes cheerR { from { transform: rotate(14deg); } to { transform: rotate(-16deg); } }
+#wall .flag.fast { animation-duration: .45s; }
 #wall .ghost { opacity: .4; pointer-events: none; }
 #wall .ghost .cl-body { animation: none; }
 #wall .aura { transform-box: fill-box; transform-origin: center; animation: aura 2.2s ease-in-out infinite; }

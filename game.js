@@ -481,9 +481,14 @@
     document.getElementById("shareBtn").addEventListener("click", share);
     document.getElementById("reviewBtn").addEventListener("click", () => { viewing = 0; renderReview(); });
     if (isToday) tick();
+    const perfect = m >= MAX_M;
+    if (perfect && !celebrate) Scene.summit(false); // coming back to a perfect climb: still standing on top
     if (celebrate) {
       celebrate = false;
-      if (m >= MAX_M) { FX.flash("#fff", 600); Scene.stamp("Summit!", "t3"); FX.confetti({ count: 220 }); SFX.play("summit"); }
+      if (perfect) {
+        document.getElementById("sceneWrap").scrollIntoView({ behavior: FX.reduced ? "auto" : "smooth", block: "center" });
+        Scene.summit(true, () => { FX.flash("#fff", 600); Scene.stamp("Summit!", "t3"); FX.confetti({ count: 220 }); SFX.play("summit"); });
+      }
       else if (m >= MAX_M * 0.5) { FX.confetti({ count: m >= MAX_M * 0.8 ? 170 : 90 }); SFX.play("finale"); }
       else SFX.play("finaleSmall");
     }

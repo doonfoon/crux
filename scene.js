@@ -52,7 +52,20 @@
       <circle cx="-19" cy="8.5" r="2" class="cl-skin"/>
       <circle cx="-4" cy="6" r="5" class="cl-skin"/>
       <path d="M-9.6 6.6 A5.6 5.6 0 0 1 1.6 6.6 L1.6 7.6 L-9.6 7.6 Z" class="cl-helmet"/>
+    </g>
+    <g class="cl-stand" style="display:none" transform="scale(.68)">
+      <path d="M0 -18 L-3.2 -0.5" class="cl-pants"/>
+      <path d="M0 -18 L3.2 -0.5" class="cl-pants"/>
+      <ellipse cx="-3.8" cy="0.6" rx="3" ry="1.7" class="cl-shoe"/>
+      <ellipse cx="3.8" cy="0.6" rx="3" ry="1.7" class="cl-shoe"/>
+      <g class="arm-l"><path d="M-1.5 -27.5 L-8 -35 L-10 -43" class="cl-arm"/><circle cx="-10" cy="-43.6" r="2" class="cl-skin"/></g>
+      <g class="arm-r"><path d="M1.5 -27.5 L8 -35 L10 -43" class="cl-arm"/><circle cx="10" cy="-43.6" r="2" class="cl-skin"/></g>
+      <line x1="0" y1="-18.5" x2="0" y2="-29" class="cl-shirt"/>
+      <rect x="-4.6" y="-20.2" width="9.2" height="3.6" rx="1.6" class="cl-harness"/>
+      <circle cx="0" cy="-35" r="5" class="cl-skin"/>
+      <path d="M-5.6 -34.4 A5.6 5.6 0 0 1 5.6 -34.4 L5.6 -33.4 L-5.6 -33.4 Z" class="cl-helmet"/>
     </g>`;
+  const SUMMIT_SPOT = { x: 172, y: 37 }; // where the climber stands, just left of the flag
 
   const Scene = {
     init({ svg, wrap, stamp, crag, maxM, seed }) {
@@ -280,7 +293,7 @@
     },
 
     // ---------- holds, rope, climber ----------
-    drawRoute(pts) {
+    drawRoute(pts, ropeEnd) {
       const g = this.gRoute;
       g.innerHTML = "";
       this.holdEls = [];
@@ -308,7 +321,7 @@
       const cur = pts.length ? pts[pts.length - 1] : this.start();
       const rp = [[117, 280]];
       pts.forEach((p) => { if (p.hit) rp.push([p.x - 8, p.y + 10]); });
-      rp.push([cur.x - 4, cur.y + 26]);
+      rp.push(ropeEnd ? [ropeEnd.x, ropeEnd.y] : [cur.x - 4, cur.y + 26]);
       let d = `M${rp[0][0]} ${rp[0][1]}`;
       for (let i = 1; i < rp.length; i++) {
         const [x0, y0] = rp[i - 1], [x1, y1] = rp[i];
@@ -325,7 +338,37 @@
       });
     },
 
-    placeClimber(p) { this.climber.style.transform = this.tf(p); },
+    placeClimber(p) { this.pose("climb"); this.climber.style.transform = this.tf(p); },
+    pose(kind) {
+      const stand = this.climber.querySelector(".cl-stand");
+      this.body.style.display = kind === "stand" ? "none" : "";
+      stand.style.display = kind === "stand" ? "" : "none";
+      this.climber.classList.toggle("cheering", kind === "stand");
+      this.svg.querySelector(".flag")?.classList.toggle("fast", kind === "stand");
+    },
+
+    // Perfect climb: scramble to the very top, stand next to the flag and cheer.
+    async summit(animate, onTop) {
+      const top = SUMMIT_SPOT;
+      const stand = () => { this.pose("stand"); this.drawRoute(this.pts, { x: top.x, y: top.y - 13 }); this.climber.style.transform = this.tf(top); };
+      if (!animate || FX.reduced) { stand(); onTop && onTop(); return; }
+      const from = this.current(), ledge = { x: 166, y: 44 };
+      const mid = { x: (from.x + ledge.x) / 2, y: (from.y + ledge.y) / 2 + 2 };
+      if (window.SFX) SFX.play("submit");
+      await run(this.climber, [{ transform: this.tf(from) }, { transform: this.tf(mid, -6), offset: 0.55 }, { transform: this.tf(mid) }], { duration: 420, easing: "ease-out" }, this.tf(mid));
+      await run(this.climber, [{ transform: this.tf(mid) }, { transform: this.tf(ledge, -6), offset: 0.55 }, { transform: this.tf(ledge) }], { duration: 420, easing: "ease-out" }, this.tf(ledge));
+      stand();
+      // pop up onto the summit
+      await run(this.climber, [{ transform: this.tf(top, 6) + " scale(1.1,.8)" }, { transform: this.tf(top, -7) + " scale(.92,1.1)", offset: 0.45 }, { transform: this.tf(top) }],
+        { duration: 560, easing: "cubic-bezier(.2,1.3,.4,1)" }, this.tf(top));
+      const s = this.screenOf(top.x, top.y - 22);
+      FX.burst(s.x, s.y, { count: 40, colors: ["#ffd76a", "#ffffff", "#ff5a36", "#c46bff"], shapes: ["star", "circle"], speed: [80, 300], g: 260, size: [4, 9], life: [0.7, 1.3] });
+      onTop && onTop();
+      // celebration jumps
+      for (let i = 0; i < 3; i++) {
+        await run(this.climber, [{ transform: this.tf(top) }, { transform: this.tf(top, -6), offset: 0.45 }, { transform: this.tf(top) }], { duration: 440, easing: "ease-in-out" }, this.tf(top));
+      }
+    },
     current() { return this.pts && this.pts.length ? this.pts[this.pts.length - 1] : this.start(); },
     redraw() { this.drawRoute(this.pts || []); this.placeClimber(this.current()); },
     tf(p, dy = 0, dx = 0) { return `translate(${(p.x + dx).toFixed(1)}px, ${(p.y + dy).toFixed(1)}px)`; },
