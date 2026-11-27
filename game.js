@@ -59,6 +59,15 @@
     return t; // anything else is its own topic
   }
   const TOPIC = QUESTIONS.map(topicOf);
+  // Two border questions "overlap" when one gives away an answer to the other (Kenya borders Ethiopia, and vice versa).
+  let SUBJ, ANS; // filled in on first use (the name helpers are defined further down)
+  const overlaps = (x, y) => {
+    if (!SUBJ) {
+      SUBJ = QUESTIONS.map((q) => { const m = q.q.match(/(?:borders|land border with) (?:the )?([^.(]+?)\s*[.(]/); return m ? norm(m[1]) : null; });
+      ANS = QUESTIONS.map((q) => new Set(entries(q).flatMap((e) => e.keys)));
+    }
+    return (SUBJ[x] && ANS[y].has(SUBJ[x])) || (SUBJ[y] && ANS[x].has(SUBJ[y]));
+  };
   const CAP = { borders: 2 }; // borders is a big topic and may appear twice a day; everything else once
 
   // Route #1 was already being played when this schedule was introduced, so it is kept exactly as it was.
@@ -80,7 +89,8 @@
       const room = (x, extra) => !picked.includes(x) && (count[TOPIC[x]] || 0) < (CAP[TOPIC[x]] || 1) + extra;
       for (let pass = 0; pass < 3; pass++) {
         const q = queues[c];
-        let i = q.findIndex((x) => room(x, 0));        // fresh topic
+        let i = q.findIndex((x) => room(x, 0) && !picked.some((y) => overlaps(x, y))); // fresh topic, no giveaways
+        if (i < 0) i = q.findIndex((x) => room(x, 0));  // fresh topic (an overlap beats a repeat)
         if (i < 0) i = q.findIndex((x) => room(x, 1)); // at most one extra of a topic
         if (i >= 0) return q.splice(i, 1)[0];
         refill(c);
