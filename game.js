@@ -131,7 +131,7 @@
 
     const a = (w) => (/^(eu|uni|us\b|use|one)/i.test(w) ? "a " : /^[aeiou]/i.test(w) ? "an " : "a ") + w;
     let m;
-    if ((m = text.match(/with exactly one other country/))) return `${name} has more than one neighbor.`;
+    if ((m = text.match(/with exactly one other country|touches only one other country/))) return `${name} touches more than one country.`;
     if ((m = text.match(/(?:borders|shares a land border with) (.+?)\.$/))) return `${name} doesn't share a border with ${m[1]}.`;
     if ((m = text.match(/that the (.+?) touches\.$/))) return `The ${m[1]} doesn't touch ${name}.`;
     if ((m = text.match(/touches (.+?)\.$/))) return `${name} doesn't touch ${m[1]}.`;

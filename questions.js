@@ -30,7 +30,7 @@ const QUESTIONS = [
         ["Paraguay"],
         ["Guyana", "Suriname"]] },
 
-  { q: "Name a landlocked country in Africa.",
+  { q: "Name a landlocked country in Africa (one with no coastline).",
     a: [["Ethiopia", "Uganda", "Zimbabwe"],
         ["Rwanda", "Zambia", "Botswana", "Mali", "Chad", "South Sudan"],
         ["Niger", "Malawi", "Burundi", "Lesotho", "Central African Republic"],
@@ -66,7 +66,7 @@ const QUESTIONS = [
         ["Bulgaria", "Croatia"],
         ["Ukraine", "Moldova"]] },
 
-  { q: "Name a country in the Nile River basin.",
+  { q: "Name a country the Nile, or a river or lake that feeds it, passes through.",
     a: [["Egypt", "Sudan"],
         ["Ethiopia", "Uganda", "South Sudan"],
         ["Kenya", "Tanzania", "Rwanda"],
@@ -90,7 +90,7 @@ const QUESTIONS = [
         ["El Salvador"],
         ["Belize"]] },
 
-  { q: "Name a Nordic country or territory.",
+  { q: "Name a Nordic country or territory (northern Europe — think Vikings!).",
     a: [["Sweden", "Norway"],
         ["Denmark", "Finland"],
         ["Iceland"],
@@ -132,7 +132,7 @@ const QUESTIONS = [
         ["Trinidad and Tobago", "Saint Lucia", "Grenada"],
         ["Dominica", "Antigua and Barbuda", "Saint Kitts and Nevis", "Saint Vincent and the Grenadines"]] },
 
-  { q: "Name a country with a coastline on the Caspian Sea.",
+  { q: "Name a country with a coastline on the Caspian Sea (the giant lake-like sea between Europe and Asia).",
     a: [["Russia", "Iran"],
         ["Kazakhstan"],
         ["Azerbaijan"],
@@ -216,11 +216,13 @@ const QUESTIONS = [
         ["Georgia"],
         ["Azerbaijan"]] },
 
-  { q: "Name a country that borders the Democratic Republic of the Congo.",
-    a: [["Republic of the Congo", "Rwanda", "Uganda"],
-        ["Angola", "Zambia", "Tanzania"],
-        ["Central African Republic", "Burundi"],
-        ["South Sudan"]] },
+  { q: "Name a country in Europe.",
+    a: [["France", "Germany", "Italy", "Spain", "United Kingdom"],
+        ["Portugal", "Greece", "Netherlands", "Ireland", "Switzerland", "Poland", "Sweden", "Norway", "Russia", "Belgium", "Austria"],
+        ["Denmark", "Finland", "Czechia", "Hungary", "Romania", "Ukraine", "Croatia", "Iceland", "Turkey", "Bulgaria", "Serbia", "Luxembourg", "Monaco",
+         "England", "Scotland", "Wales", "Northern Ireland"],
+        ["Slovakia", "Slovenia", "Estonia", "Latvia", "Lithuania", "Belarus", "Moldova", "Albania", "Bosnia and Herzegovina", "Montenegro", "North Macedonia",
+         "Kosovo", "Malta", "Cyprus", "Andorra", "Liechtenstein", "San Marino", ["Vatican City", "Vatican", "Holy See"], "Georgia", "Armenia", "Azerbaijan", "Kazakhstan"]] },
 
   { q: "Name a US state that the Mississippi River touches.",
     a: [["Mississippi", "Louisiana", "Missouri"],
@@ -319,8 +321,13 @@ const QUESTIONS = [
   { q: "Name a country that borders Hungary.",
     a: [["Austria", "Romania"], ["Slovakia", "Serbia"], ["Croatia", "Ukraine"], ["Slovenia"]] },
 
-  { q: "Name a country that borders Serbia.",
-    a: [["Croatia", "Hungary", "Bosnia and Herzegovina"], ["Romania", "Bulgaria", "Kosovo"], ["Montenegro"], ["North Macedonia"]] },
+  { q: "Name a country in Africa.",
+    a: [["Egypt", "South Africa", "Nigeria", "Kenya"],
+        ["Morocco", "Ethiopia", "Ghana", "Algeria", "Tunisia", "Libya", "Madagascar", "Tanzania", "Uganda", "Zimbabwe", "Somalia", "Sudan"],
+        ["Senegal", "Cameroon", ["Ivory Coast", "Côte d'Ivoire", "Cote dIvoire"], "Angola", "Mozambique", "Zambia", "Rwanda", "Mali", "Niger", "Chad", "Namibia",
+         "Botswana", "Democratic Republic of the Congo", "Republic of the Congo", "Liberia", "Sierra Leone", "South Sudan", "Eritrea", "Malawi"],
+        ["Burundi", "Benin", "Togo", "Burkina Faso", "Guinea", "Guinea-Bissau", "Gambia", "Mauritania", "Gabon", "Equatorial Guinea", "Central African Republic",
+         "Djibouti", "Lesotho", "Eswatini", "Cape Verde", "Sao Tome and Principe", "Comoros", "Mauritius", "Seychelles", "Western Sahara"]] },
 
   { q: "Name a country that borders Nigeria.",
     a: [["Niger", "Cameroon"], ["Chad"], ["Benin"], []] },
@@ -331,11 +338,16 @@ const QUESTIONS = [
   { q: "Name a country that borders Libya.",
     a: [["Egypt", "Tunisia"], ["Algeria"], ["Chad", "Sudan"], ["Niger"]] },
 
-  { q: "Name a country (or territory) that borders Algeria.",
-    a: [["Morocco", "Tunisia", "Libya"], ["Mali", "Niger"], ["Mauritania"], ["Western Sahara"]] },
+  { q: "Name a country in Asia.",
+    a: [["China", "Japan", "India"],
+        ["South Korea", "Thailand", "Vietnam", "Indonesia", "Philippines", "Pakistan", "Russia", "Saudi Arabia", "Israel", "Iran", "Iraq", "North Korea", "Afghanistan"],
+        ["Malaysia", "Singapore", "Nepal", "Bangladesh", "Sri Lanka", "Mongolia", "Turkey", "Taiwan", "Cambodia", "Myanmar", "Laos", "Kazakhstan", "Syria",
+         "Jordan", "Lebanon", "United Arab Emirates", "Qatar", "Kuwait", "Yemen", "Oman"],
+        ["Bhutan", "Maldives", "Brunei", "East Timor", "Uzbekistan", "Turkmenistan", "Kyrgyzstan", "Tajikistan", "Bahrain", "Georgia", "Armenia", "Azerbaijan",
+         "Cyprus", "Palestine"]] },
 
-  { q: "Name a country that borders Kazakhstan.",
-    a: [["Russia", "China"], ["Uzbekistan"], ["Kyrgyzstan"], ["Turkmenistan"]] },
+  { q: "Name a US state that starts with the letter W.",
+    a: [["Washington"], ["Wisconsin"], ["Wyoming"], ["West Virginia"]] },
 
   { q: "Name a country that borders Pakistan.",
     a: [["India", "Afghanistan"], ["Iran"], ["China"], []] },
@@ -400,7 +412,7 @@ const QUESTIONS = [
         ["Georgia", "Maryland", "Connecticut", "Delaware"],
         ["Rhode Island", "New Hampshire"]] },
 
-  { q: "Name one of the Four Corners states.",
+  { q: "Name one of the Four Corners states (the 4 US states that meet at a single point).",
     a: [["Arizona", "Colorado"], ["Utah"], ["New Mexico"], []] },
 
   { q: "Name one of the four countries that make up the United Kingdom.",
@@ -415,7 +427,7 @@ const QUESTIONS = [
         ["Algeria", "Tunisia", "Libya", "Sudan", "Bahrain", "Palestine"],
         ["Mauritania", "Somalia", "Djibouti", "Comoros", "Chad"]] },
 
-  { q: "Name a country in Oceania.",
+  { q: "Name a country in Oceania (Australia and the Pacific islands).",
     a: [["Australia", "New Zealand"],
         ["Fiji", "Papua New Guinea"],
         ["Samoa", "Tonga", "Solomon Islands", "Vanuatu"],
@@ -424,22 +436,22 @@ const QUESTIONS = [
   { q: "Name an island country in the Indian Ocean.",
     a: [["Madagascar", "Sri Lanka"], ["Maldives"], ["Mauritius", "Seychelles"], ["Comoros"]] },
 
-  { q: "Name a country (or territory) the Tropic of Cancer passes through.",
+  { q: "Name a country (or territory) the Tropic of Cancer passes through. (It's the line about 23° north of the Equator, crossing Mexico and the Sahara.)",
     a: [["Mexico", "India", "Egypt"],
         ["Saudi Arabia", "China", "Bahamas"],
         ["Algeria", "Libya", "Oman", "Bangladesh", "Taiwan", "Myanmar"],
         ["Mali", "Niger", "Mauritania", "United Arab Emirates", "Western Sahara"]] },
 
-  { q: "Name a country the Tropic of Capricorn passes through.",
+  { q: "Name a country the Tropic of Capricorn passes through. (It's the line about 23° south of the Equator, crossing Brazil and Australia.)",
     a: [["Australia", "Brazil"],
         ["Chile", "Argentina", "South Africa", "Madagascar"],
         ["Paraguay", "Namibia", "Mozambique", "Botswana"],
         []] },
 
-  { q: "Name a country the Arctic Circle passes through.",
+  { q: "Name a country the Arctic Circle passes through. (It's the line around the top of the globe, near the North Pole.)",
     a: [["Russia", "Canada", "Norway"], ["Sweden", "Finland", "United States"], [["Denmark", "Greenland"]], ["Iceland"]] },
 
-  { q: "Name a G7 country.",
+  { q: "Name one of the G7 countries (a club of 7 big, wealthy democracies).",
     a: [["United States", "United Kingdom", "Japan"], ["Germany", "France"], ["Canada"], ["Italy"]] },
 
   { q: "Name a country that has hosted the Summer Olympics.",
@@ -466,7 +478,7 @@ const QUESTIONS = [
         ["Regina", "Fredericton", "St. John's"],
         ["Charlottetown", "Whitehorse", "Yellowknife", "Iqaluit"]] },
 
-  { q: "Name a European country that has a monarch.",
+  { q: "Name a European country that has a king, queen or ruling prince.",
     a: [["United Kingdom", "Spain"],
         ["Sweden", "Norway", "Netherlands", "Denmark", "Belgium"],
         ["Monaco"],
@@ -496,7 +508,7 @@ const QUESTIONS = [
   { q: "Name a country with a coastline on the Persian Gulf.",
     a: [["Iran", "Saudi Arabia"], ["Kuwait", "Qatar", "United Arab Emirates"], ["Iraq", "Bahrain"], ["Oman"]] },
 
-  { q: "Name a country with a coastline on the Adriatic Sea.",
+  { q: "Name a country with a coastline on the Adriatic Sea (the sea on Italy's east side).",
     a: [["Italy", "Croatia"], ["Albania"], ["Montenegro", "Slovenia"], ["Bosnia and Herzegovina"]] },
 
   { q: "Name a country with a shoreline on Lake Victoria.",
@@ -508,13 +520,13 @@ const QUESTIONS = [
   { q: "Name a country whose English name ends in \"-land\".",
     a: [["Poland", "Ireland", "Finland"], ["Switzerland", "Iceland", "New Zealand"], ["Thailand"], []] },
 
-  { q: "Name a country that shares a land border with exactly one other country.",
+  { q: "Name a country that touches only one other country by land (like Portugal, which only touches Spain).",
     a: [["Portugal", "Ireland", "Haiti", "Dominican Republic", "South Korea"],
         ["Monaco", "San Marino", ["Vatican City", "Vatican", "Holy See"], "Lesotho"],
         ["Gambia", "Qatar", "Brunei"],
         ["East Timor", "Papua New Guinea"]] },
 
-  { q: "Name a country the Prime Meridian (0° longitude) passes through.",
+  { q: "Name a country the Prime Meridian passes through (0° longitude — the line that runs through London).",
     a: [["United Kingdom"], ["France", "Spain"], ["Algeria", "Ghana", "Mali"], ["Burkina Faso", "Togo"]] },
 ];
 
@@ -568,7 +580,7 @@ QUESTIONS.push(
     a: [["Egypt"], ["Iraq", "Syria"], ["Yemen"], ["Sudan"]] },
 
   // ---------- NATURE ----------
-  { cat: "nature", map: "points", q: "Name one of the 14 mountains taller than 8,000 meters.",
+  { cat: "nature", map: "points", q: "Name one of the 14 mountains taller than 8,000 meters (they're all in Asia — think Everest).",
     a: [[["Mount Everest", "Everest", "Sagarmatha", "Chomolungma"], "K2"],
         ["Kangchenjunga", "Annapurna"],
         ["Lhotse", "Makalu", "Nanga Parbat", "Cho Oyu"],
@@ -706,7 +718,7 @@ QUESTIONS.push(
         ["Calgary", "Nagano", ["Turin", "Torino"], "Lillehammer", "Innsbruck", "Pyeongchang", "Sarajevo"],
         ["Sapporo", "Grenoble", "Albertville", "Oslo", ["St. Moritz", "Saint Moritz"], ["Milan", "Milano"], ["Cortina d'Ampezzo", "Cortina"]],
         ["Chamonix", ["Garmisch-Partenkirchen", "Garmisch"], ["Squaw Valley", "Palisades Tahoe"]]] },
-  { cat: "city", map: "points", q: "Name a city on the Danube River.",
+  { cat: "city", map: "points", q: "Name a city on the Danube River (the long river that flows through Vienna).",
     a: [["Vienna", "Budapest"], ["Belgrade", "Bratislava"], ["Linz", "Passau", "Regensburg", "Ulm", "Novi Sad"],
         ["Ingolstadt", "Ruse", ["Galati", "Galați"], "Vukovar", "Krems", "Esztergom", "Vidin", "Izmail", "Braila", "Donaueschingen"]] },
   { cat: "city", map: "points", q: "Name a city in Japan.",
@@ -782,6 +794,8 @@ QUESTIONS.push(
 
 // Older questions: tag their category and map style.
 const CAT_FIX = {
+  "Name a landlocked country in Africa (one with no coastline).": ["other"],
+  "Name a country (or territory) the Tropic of Cancer passes through. (It's the line about 23° north of the Equator, crossing Mexico and the Sahara.)": ["other"],
   "Name a capital city in South America.": ["city", "points"],
   "Name a Nordic capital city.": ["city", "points"],
   "Name an Australian state or territory capital.": ["city", "points"],
@@ -793,7 +807,7 @@ const CAT_FIX = {
   "Name an Australian state or territory.": [null, "none"],
   "Name one of the four countries that make up the United Kingdom.": [null, "none"],
   "Name a New England state.": [null, "us"],
-  "Name one of the Four Corners states.": [null, "us"],
+  "Name one of the Four Corners states (the 4 US states that meet at a single point).": [null, "us"],
 };
 const NATURE_RX = /\b(River|Lake|Sea|Ocean|oceans|Gulf|Alps|Andes|Himalayas|Sahara|Amazon|Mekong|Rhine|Danube|Nile|coastline|shoreline|Coast)\b/;
 QUESTIONS.forEach((q) => {
