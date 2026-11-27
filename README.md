@@ -14,7 +14,9 @@ answers, and **rarer right answers are harder holds that climb you higher**.
 ## Files
 - `index.html` – the page
 - `style.css` – the look
-- `game.js` – the game logic
+- `game.js` – the game logic and screens
+- `scene.js` – the illustrated climbing wall and the move animations
+- `fx.js` – confetti, sparks, chalk puffs and the hold drawings
 - `questions.js` – **the question bank** (edit this to add questions or change how rare an answer is)
 
 ## Adding a question
@@ -26,6 +28,6 @@ Add `?route=3` to the address to replay route #3 (it won't count toward your str
 
 ## Publishing free on GitHub Pages
 1. Create a new public repository on github.com (e.g. `crux`).
-2. Upload these four files to it (**Add file → Upload files**).
+2. Upload these files to it (**Add file → Upload files**).
 3. Go to **Settings → Pages**, set *Source* to `Deploy from a branch`, branch `main`, folder `/ (root)`, and save.
 4. After a minute your game is live at `https://<your-username>.github.io/crux/`.

@@ -2,56 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Crux · Daily Geography Climb</title>
   <meta name="description" content="A daily geography trivia climb. Rarer right answers are harder holds — and take you higher.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧗</text></svg>">
+  <meta name="theme-color" content="#f3ede2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1219" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' rx='11' fill='%23ff5a36'/><path d='M7 31 L16 15 L21 22 L25 17 L33 31 Z' fill='white'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="app">
     <header class="top">
-      <div class="brand">
-        <span class="logo">CRUX</span>
-        <span class="tag">daily geography climb</span>
+      <a class="brand" href="./" aria-label="Crux home">
+        <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+          <rect width="40" height="40" rx="11" fill="var(--accent)"/>
+          <path d="M6 31 L16 14 L21 21.5 L25.5 16 L34 31 Z" fill="#fff"/>
+          <path d="M16 14 L18.6 18.4 L16 20.2 L13.5 18.2 Z" fill="var(--accent-2)"/>
+          <path d="M25.5 16 V8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+          <path d="M25.5 8.2 L30.5 9.8 L25.5 11.6 Z" fill="#fff"/>
+        </svg>
+        <span class="word">CRUX</span>
+      </a>
+      <div class="top-right">
+        <div class="streak" id="streak" title="Daily streak">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 2c.6 3.6 5.5 5.6 5.5 11a6 6 0 0 1-12 0c0-2.6 1.4-4.5 2.7-5.6.1 1.8.9 3 2 3.3-.4-3.2.3-6.4 1.8-8.7Z"/></svg>
+          <b id="streakNum">0</b>
+        </div>
+        <button class="icon-btn" id="helpBtn" aria-label="How to play">?</button>
       </div>
-      <button class="icon-btn" id="helpBtn" aria-label="How to play">?</button>
     </header>
 
-    <section class="crag" id="crag"></section>
+    <section class="sign" id="crag"></section>
 
-    <section class="wall-wrap">
-      <svg id="wall" viewBox="0 0 320 220" role="img" aria-label="Climbing wall showing your progress"></svg>
-      <div class="altimeter">
-        <span class="alt-label">height</span>
-        <span class="alt-value" id="altValue">0 m</span>
+    <section class="scene-wrap" id="sceneWrap">
+      <svg id="wall" viewBox="0 0 360 320" role="img" aria-label="Climbing wall showing your progress"></svg>
+      <div class="alt" id="alt">
+        <span class="alt-k">Altitude</span>
+        <span class="alt-v"><b id="altValue">0</b><i>m</i></span>
       </div>
+      <div class="stamp" id="stamp" aria-hidden="true"></div>
     </section>
 
-    <main id="play"></main>
+    <main id="play" aria-live="polite"></main>
 
-    <footer class="foot">A new route every day at midnight · <span id="stats"></span></footer>
+    <footer class="foot"><span id="stats"></span><br>A new route every day at midnight</footer>
   </div>
 
   <dialog id="help">
+    <div class="help-hero" aria-hidden="true">
+      <span data-hold="0"></span><span data-hold="1"></span><span data-hold="2"></span><span data-hold="3"></span>
+    </div>
     <h2>How to climb</h2>
-    <p>Every day there's a new route with <b>7 geography questions</b>. Each one has many right answers — you get <b>one try and 30 seconds</b> per question.</p>
-    <p>The <b>less common</b> your right answer, the harder the hold you grabbed and the <b>higher you climb</b>:</p>
+    <p>Every day there's a new route at a real crag somewhere in the world, with <b>7 geography questions</b>. Each has lots of right answers — you get <b>one try and 30 seconds</b>.</p>
+    <p>The <b>rarer</b> your right answer, the harder the hold — and the <b>higher you climb</b>.</p>
     <ul class="legend">
-      <li><span class="dot g0"></span><b>Jug</b> · the answer most people give · +100 m</li>
-      <li><span class="dot g1"></span><b>Sloper</b> · good thinking · +200 m</li>
-      <li><span class="dot g2"></span><b>Crimp</b> · not many people think of it · +300 m</li>
-      <li><span class="dot g3"></span><b>Foot Chip</b> · a deep cut! · +400 m</li>
-      <li><span class="dot gx"></span><b>Slip</b> · wrong answer or out of time · +0 m</li>
+      <li class="t0"><span data-hold="0"></span><div><b>Jug</b><small>The answer most people give</small></div><em>+100 m</em></li>
+      <li class="t1"><span data-hold="1"></span><div><b>Sloper</b><small>Good thinking</small></div><em>+200 m</em></li>
+      <li class="t2"><span data-hold="2"></span><div><b>Crimp</b><small>Not many people find it</small></div><em>+300 m</em></li>
+      <li class="t3"><span data-hold="3"></span><div><b>Foot Chip</b><small>A legendary deep cut</small></div><em>+400 m</em></li>
+      <li class="tx"><span data-hold="-1"></span><div><b>Slip</b><small>Wrong answer or out of time</small></div><em>+0 m</em></li>
     </ul>
-    <p>Small typos are fine. Climb all 7 perfectly with Foot Chips to top out at <b>2,800 m</b>.</p>
-    <form method="dialog"><button class="btn">Let's climb</button></form>
+    <p class="help-foot">Small typos are fine. Seven Foot Chips tops out at <b>2,800 m</b>.</p>
+    <form method="dialog"><button class="btn wide">Let's climb <span aria-hidden="true">↑</span></button></form>
   </dialog>
 
   <script src="questions.js"></script>
+  <script src="fx.js"></script>
+  <script src="scene.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

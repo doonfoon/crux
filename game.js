@@ -3,12 +3,12 @@
   const MOVES = 7;
   const SECONDS = 30; // time allowed per question
   const HOLDS = [
-    { name: "Jug", m: 100, emoji: "🟩", blurb: "A big, friendly hold — a solid, popular answer." },
-    { name: "Sloper", m: 200, emoji: "🟦", blurb: "Nice — a step off the beaten path." },
-    { name: "Crimp", m: 300, emoji: "🟧", blurb: "Not many climbers find this one." },
-    { name: "Foot Chip", m: 400, emoji: "🟪", blurb: "A tiny hold almost nobody spots — what a deep cut!" },
+    { name: "Jug", m: 100, emoji: "🟩", title: "Clean grab!", blurb: "A big, friendly hold — a solid, popular answer.", delay: 0.5 },
+    { name: "Sloper", m: 200, emoji: "🟦", title: "Smooth move!", blurb: "Nice — a step off the beaten path.", delay: 0.75 },
+    { name: "Crimp", m: 300, emoji: "🟧", title: "Crimped it!", blurb: "Not many climbers find this one.", delay: 0.95 },
+    { name: "Foot Chip", m: 400, emoji: "🟪", title: "Deep cut!", blurb: "A tiny hold almost nobody spots. Legendary.", delay: 1.9 },
   ];
-  const SLIP = { name: "Slip", emoji: "⬛" };
+  const SLIP = { emoji: "⬛" };
   const MAX_M = MOVES * HOLDS[3].m;
   const RANKS = [
     [0, "Gumby"], [600, "Weekend Warrior"], [1000, "Crag Rat"],
@@ -98,167 +98,11 @@
     return best ? { ...best, fuzzy: true } : { tier: -1 };
   }
 
-  // ---------- state ----------
-  const stateKey = `crux-route-${day + 1}`;
-  let state = store.get(stateKey, { answers: [] }); // {input, display, tier, fuzzy}
-  const height = () => state.answers.reduce((s, a) => s + (a.tier >= 0 ? HOLDS[a.tier].m : 0), 0);
-  let viewing = null; // index of the answer whose result card is showing
-
-  // ---------- wall drawing ----------
-  const svg = document.getElementById("wall");
-  const NS = "http://www.w3.org/2000/svg";
-  const W = 320, H = 220, BASE = 200, TOP = 36;
-  const yFor = (m) => BASE - (m / MAX_M) * (BASE - TOP);
-  const el = (tag, attrs, parent = svg) => {
-    const e = document.createElementNS(NS, tag);
-    for (const k in attrs) e.setAttribute(k, attrs[k]);
-    parent.appendChild(e);
-    return e;
-  };
-  const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-
-  function holdPositions() {
-    const r = rng(day * 31 + 7);
-    let m = 0;
-    return state.answers.map((a, i) => {
-      if (a.tier >= 0) m += HOLDS[a.tier].m;
-      const side = i % 2 === 0 ? -1 : 1;
-      return { x: 150 + side * (25 + r() * 55), y: yFor(m), tier: a.tier };
-    });
-  }
-
-  function drawWall(animateSlip) {
-    svg.innerHTML = "";
-    const defs = el("defs", {});
-    const g = el("linearGradient", { id: "sky", x1: 0, y1: 0, x2: 0, y2: 1 }, defs);
-    el("stop", { offset: "0", "stop-color": css("--sky-top") }, g);
-    el("stop", { offset: "1", "stop-color": css("--sky-bot") }, g);
-    el("rect", { x: 0, y: 0, width: W, height: H, fill: "url(#sky)" });
-
-    // rock face
-    el("path", {
-      d: "M20 220 L34 154 L22 110 L44 67 L60 29 L96 16 L150 10 L196 18 L238 13 L262 44 L280 88 L268 132 L292 176 L300 220 Z",
-      fill: css("--rock"),
-    });
-    const crack = { fill: "none", stroke: css("--rock-dark"), "stroke-width": 2, "stroke-linecap": "round", opacity: .7 };
-    el("path", { ...crack, d: "M110 220 L118 183 L108 154 L124 125 L116 88" });
-    el("path", { ...crack, d: "M210 205 L202 169 L216 139 L206 110 L220 73 L212 44" });
-    el("path", { ...crack, d: "M70 132 L90 110 L80 88" });
-    el("path", { ...crack, d: "M240 110 L250 88" });
-
-    // ground + summit flag
-    el("rect", { x: 0, y: BASE + 4, width: W, height: H - BASE, fill: css("--rock-dark") });
-    el("line", { x1: 150, y1: TOP, x2: 150, y2: TOP - 22, stroke: css("--ink"), "stroke-width": 2 });
-    el("path", { d: `M150 ${TOP - 22} L170 ${TOP - 17} L150 ${TOP - 12} Z`, fill: css("--accent") });
-
-    // altitude ticks
-    for (let m = 0; m <= MAX_M; m += 700) {
-      const y = yFor(m);
-      el("line", { x1: 0, y1: y, x2: 14, y2: y, stroke: css("--ink"), opacity: .35 });
-      const t = el("text", { x: 17, y: y + 4, "font-size": 10, fill: css("--ink"), opacity: .55, "font-family": "Space Grotesk" });
-      t.textContent = m === MAX_M ? "2800 summit" : `${m}`;
-    }
-
-    // rope + holds
-    const pts = holdPositions();
-    let path = `M150 ${BASE + 4}`;
-    pts.forEach((p) => { path += ` L${p.x.toFixed(1)} ${p.y.toFixed(1)}`; });
-    el("path", { class: "rope", d: path, fill: "none", stroke: css("--accent"), "stroke-width": 2, "stroke-dasharray": "5 4" });
-
-    pts.forEach((p, i) => {
-      if (p.tier >= 0) {
-        el("ellipse", { cx: p.x, cy: p.y + 5, rx: 9 + p.tier, ry: 6, fill: css(`--g${p.tier}`), stroke: css("--ink"), "stroke-width": 1.2 });
-      } else {
-        const x = el("g", { class: animateSlip && i === pts.length - 1 ? "slip" : "" });
-        el("path", { d: `M${p.x - 4} ${p.y + 8} l8 8 M${p.x + 4} ${p.y + 8} l-8 8`, stroke: css("--gx"), "stroke-width": 2.5, "stroke-linecap": "round" }, x);
-      }
-    });
-
-    // climber
-    const last = pts[pts.length - 1] || { x: 150, y: BASE + 4 };
-    const c = el("g", { class: "climber" + (animateSlip ? " slip" : "") });
-    c.setAttribute("transform", `translate(${last.x} ${last.y - 14})`);
-    el("circle", { cx: 0, cy: -10, r: 6, fill: css("--ink") }, c);
-    el("path", { d: "M0 -4 L0 8 M0 0 L-8 -8 M0 0 L8 -6 M0 8 L-6 16 M0 8 L7 15", stroke: css("--ink"), "stroke-width": 3, "stroke-linecap": "round", fill: "none" }, c);
-    el("path", { d: "M-4 -15 L4 -15 L5 -12 L-5 -12 Z", fill: css("--accent") }, c);
-
-    document.getElementById("altValue").textContent = `${height().toLocaleString()} m`;
-  }
-
-  // ---------- screens ----------
-  const play = document.getElementById("play");
-  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-
-  function render(animateSlip = false) {
-    drawWall(animateSlip);
-    if (viewing !== null) return renderResult(viewing);
-    if (state.answers.length >= MOVES) return renderSummary();
-    renderQuestion();
-  }
-
-  let timer = null;
-
-  function renderQuestion() {
-    const i = state.answers.length;
-    const q = QUESTIONS[qIds[i]];
-    // The clock keeps running through a page refresh, so reloading can't buy extra time.
-    if (!state.clock || state.clock.i !== i) { state.clock = { i, start: Date.now() }; store.set(stateKey, state); }
-    const deadline = state.clock.start + SECONDS * 1000;
-    play.innerHTML = `
-      <div class="card">
-        <div class="move-row">
-          <div class="move">Move ${i + 1} of ${MOVES}</div>
-          <div class="clock" id="clock"><span id="clockNum">${SECONDS}</span>s</div>
-        </div>
-        <div class="timebar"><div class="timefill" id="timefill"></div></div>
-        <div class="question">${esc(q.q)}</div>
-        <form class="answer-row" id="answerForm" autocomplete="off">
-          <input id="answer" type="text" placeholder="Your answer…" autocapitalize="words" spellcheck="false" aria-label="Your answer">
-          <button class="btn" type="submit">Climb</button>
-        </form>
-        <div class="hint">One try, ${SECONDS} seconds. Rarer right answers climb higher.</div>
-      </div>`;
-    const input = document.getElementById("answer");
-    if (matchMedia("(hover: hover)").matches) input.focus();
-
-    const finish = (raw, timedOut) => {
-      clearInterval(timer); timer = null;
-      const r = timedOut ? { tier: -1 } : judge(q, raw);
-      state.answers.push({ input: raw, display: r.display || raw, tier: r.tier, fuzzy: !!r.fuzzy, timeout: timedOut });
-      delete state.clock;
-      store.set(stateKey, state);
-      if (state.answers.length === MOVES) recordStats();
-      viewing = state.answers.length - 1;
-      render(r.tier < 0);
-    };
-
-    const fill = document.getElementById("timefill"), num = document.getElementById("clockNum"), clock = document.getElementById("clock");
-    const tickClock = () => {
-      const left = Math.max(0, deadline - Date.now());
-      const secs = Math.ceil(left / 1000);
-      num.textContent = secs;
-      fill.style.width = `${(left / (SECONDS * 1000)) * 100}%`;
-      clock.classList.toggle("urgent", secs <= 10);
-      fill.classList.toggle("urgent", secs <= 10);
-      if (left <= 0) finish(input.value.trim(), true);
-    };
-    clearInterval(timer);
-    timer = setInterval(tickClock, 200);
-    tickClock();
-
-    document.getElementById("answerForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const raw = input.value.trim();
-      if (!raw) return input.focus();
-      finish(raw, false);
-    });
-  }
-
   // ---------- "why didn't that land?" notes ----------
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const COUNTRY_SET = new Set(KNOWN_COUNTRIES.map(norm));
   const STATE_SET = new Set(KNOWN_STATES.map(norm));
   const plural = (s) => /(alps|andes|himalayas|mountains)$/i.test(s);
-  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
   function whyNot(q, input) {
     const n = ALIAS[norm(input)] || norm(input);
@@ -300,90 +144,264 @@
     return `${name} is a real place, but it isn't one of the right answers here.`;
   }
 
+  // ---------- state ----------
+  const stateKey = `crux-route-${day + 1}`;
+  let state = store.get(stateKey, { answers: [] }); // {input, display, tier, fuzzy, timeout}
+  const height = (answers = state.answers) => answers.reduce((s, a) => s + (a.tier >= 0 ? HOLDS[a.tier].m : 0), 0);
+  let viewing = null;     // index of the answer whose result card is showing
+  let celebrate = false;  // play the finale when the summary first appears
+  let timer = null;
+
+  const play = document.getElementById("play");
+  const iconFor = (a) => FX.holdIcon(a.timeout ? -2 : a.tier);
+  const rankFor = (m) => RANKS.filter(([min]) => m >= min).pop()[1];
+
+  // ---------- altimeter ----------
+  const altEl = document.getElementById("altValue"), altBox = document.getElementById("alt");
+  let altShown = 0;
+  function setAlt(v) { altShown = v; altEl.textContent = v.toLocaleString(); }
+  function countAlt(to, tier) {
+    const from = altShown, t0 = performance.now(), dur = FX.reduced ? 1 : 900;
+    altBox.style.setProperty("--pulse", `var(--${["jug", "sloper", "crimp", "chip"][tier]})`);
+    altBox.classList.remove("bump"); void altBox.offsetWidth; altBox.classList.add("bump");
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      altEl.textContent = Math.round(from + (to - from) * e).toLocaleString();
+      if (k < 1) requestAnimationFrame(step); else setAlt(to);
+    };
+    requestAnimationFrame(step);
+  }
+
+  // ---------- screens ----------
+  function render() {
+    Scene.drawRoute(Scene.points(state.answers));
+    Scene.placeClimber(Scene.current());
+    setAlt(height());
+    if (viewing !== null) return renderResult(viewing, false);
+    if (state.answers.length >= MOVES) return renderSummary();
+    renderQuestion();
+  }
+
+  function pips(current) {
+    return `<div class="pips" aria-hidden="true">${Array.from({ length: MOVES }, (_, i) => {
+      const a = state.answers[i];
+      if (a) return `<i class="pip ${a.tier >= 0 ? "t" + a.tier : "tx"}"></i>`;
+      return `<i class="pip ${i === current ? "now" : ""}"></i>`;
+    }).join("")}</div>`;
+  }
+
+  function renderQuestion() {
+    const i = state.answers.length;
+    const q = QUESTIONS[qIds[i]];
+    // Don't start the clock while the "How to climb" screen is still open.
+    const helpBox = document.getElementById("help");
+    if (helpBox.open && !state.clock) {
+      play.innerHTML = `<div class="card q-card"><div class="eyebrow">Move ${i + 1} of ${MOVES}</div><h2 class="question">Ready when you are…</h2></div>`;
+      helpBox.addEventListener("close", () => renderQuestion(), { once: true });
+      return;
+    }
+    // The clock keeps running through a page refresh, so reloading can't buy extra time.
+    if (!state.clock || state.clock.i !== i) { state.clock = { i, start: Date.now() }; store.set(stateKey, state); }
+    const deadline = state.clock.start + SECONDS * 1000;
+    play.innerHTML = `
+      <div class="card q-card enter" id="qCard">
+        <div class="q-head">
+          <div>
+            <div class="eyebrow">Move ${i + 1} of ${MOVES}</div>
+            ${pips(i)}
+          </div>
+          <div class="ring" id="ring" role="timer" aria-label="Seconds left">
+            <svg viewBox="0 0 48 48"><circle class="ring-bg" cx="24" cy="24" r="20"/><circle class="ring-fg" id="ringFg" cx="24" cy="24" r="20" pathLength="100"/></svg>
+            <span id="clockNum">${SECONDS}</span>
+          </div>
+        </div>
+        <h2 class="question">${esc(q.q)}</h2>
+        <form class="answer-row" id="answerForm" autocomplete="off">
+          <input id="answer" type="text" placeholder="Type your answer…" autocapitalize="words" spellcheck="false" aria-label="Your answer" enterkeyhint="go">
+          <button class="btn" type="submit">Climb <span aria-hidden="true">↑</span></button>
+        </form>
+        <div class="hint">One try · ${SECONDS} seconds · rarer right answers climb higher</div>
+      </div>`;
+    const input = document.getElementById("answer");
+    if (matchMedia("(hover: hover)").matches) input.focus();
+
+    const finish = (raw, timedOut) => {
+      clearInterval(timer); timer = null;
+      const r = timedOut ? { tier: -1 } : judge(q, raw);
+      state.answers.push({ input: raw, display: r.display || raw, tier: r.tier, fuzzy: !!r.fuzzy, timeout: timedOut });
+      delete state.clock;
+      store.set(stateKey, state);
+      if (state.answers.length === MOVES) { recordStats(); celebrate = true; }
+      viewing = state.answers.length - 1;
+      const pts = Scene.points(state.answers);
+      renderResult(viewing, true);
+      Scene.playMove(pts, () => { if (r.tier >= 0) countAlt(height(), r.tier); });
+    };
+
+    const ring = document.getElementById("ring"), fg = document.getElementById("ringFg"), num = document.getElementById("clockNum"), card = document.getElementById("qCard");
+    let lastSecs = null;
+    const tickClock = () => {
+      const left = Math.max(0, deadline - Date.now());
+      const secs = Math.ceil(left / 1000);
+      fg.style.strokeDashoffset = (100 * (1 - left / (SECONDS * 1000))).toFixed(2);
+      if (secs !== lastSecs) {
+        lastSecs = secs;
+        num.textContent = secs;
+        ring.classList.toggle("mid", secs <= 15 && secs > 10);
+        ring.classList.toggle("urgent", secs <= 10);
+        card.classList.toggle("urgent", secs <= 10);
+        if (secs <= 5 && secs > 0 && !FX.reduced) num.animate([{ transform: "scale(1.35)" }, { transform: "scale(1)" }], { duration: 300, easing: "ease-out" });
+      }
+      if (left <= 0) finish(input.value.trim(), true);
+    };
+    clearInterval(timer);
+    timer = setInterval(tickClock, 100);
+    tickClock();
+
+    document.getElementById("answerForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const raw = input.value.trim();
+      if (!raw) { input.focus(); if (!FX.reduced) input.animate([{ transform: "translateX(-5px)" }, { transform: "translateX(5px)" }, { transform: "none" }], { duration: 220 }); return; }
+      finish(raw, false);
+    });
+  }
+
   function holdList(q, you) {
     return q.a.map((group, t) => group.length ? `
-      <div class="hold-group">
-        <div class="label"><span class="dot g${t}"></span>${HOLDS[t].name} · +${HOLDS[t].m} m</div>
-        <div class="names">${group.map((a) => {
-          const name = Array.isArray(a) ? a[0] : a;
-          return name === you ? `<span class="you">${esc(name)}</span>` : esc(name);
-        }).join(", ")}</div>
+      <div class="hold-group t${t}">
+        ${FX.holdIcon(t, "hold-icon sm")}
+        <div>
+          <div class="hg-label">${HOLDS[t].name} <span>+${HOLDS[t].m} m</span></div>
+          <div class="hg-names">${group.map((a) => {
+            const name = Array.isArray(a) ? a[0] : a;
+            return name === you ? `<mark>${esc(name)}</mark>` : esc(name);
+          }).join(", ")}</div>
+        </div>
       </div>` : "").join("");
   }
 
-  function renderResult(i) {
+  function meter(t) {
+    return `<div class="meter" aria-label="Rarity: ${HOLDS[t].name}">
+      <span class="meter-k">Rarity</span>
+      <div class="segs">${HOLDS.map((_, k) => `<i class="${k <= t ? "on t" + k : ""}" style="--k:${k}"></i>`).join("")}</div>
+      <span class="meter-v">${["Common", "Uncommon", "Rare", "Ultra rare"][t]}</span>
+    </div>`;
+  }
+
+  function renderResult(i, fresh) {
     const a = state.answers[i];
     const q = QUESTIONS[qIds[i]];
     const hit = a.tier >= 0;
     const h = hit ? HOLDS[a.tier] : null;
     const last = i === MOVES - 1;
+    const delay = fresh && !FX.reduced ? (hit ? h.delay : 0.55) : 0;
+    const kind = hit ? `t${a.tier}` : a.timeout ? "tt" : "tx";
     play.innerHTML = `
-      <div class="card">
-        <div class="move">Move ${i + 1} of ${MOVES}</div>
-        <div class="question">${esc(q.q)}</div>
-        <div class="result ${hit ? "hit" : "miss"}">
-          ${hit ? `
-            <div class="big"><span class="dot g${a.tier}"></span> ${h.name} &nbsp;+${h.m} m</div>
-            <div>${esc(a.display)}${a.fuzzy ? ` <span class="sub">(we read “${esc(a.input)}” as ${esc(a.display)})</span>` : ""} — ${h.blurb}</div>`
-          : a.timeout ? `
-            <div class="big">⏱ Time's up! +0 m</div>
-            <div>${a.input ? `You were typing “${esc(a.input)}” when the clock ran out.` : "The clock ran out."} The rope caught you — keep climbing.</div>`
-          : `
-            <div class="big">Slip! +0 m</div>
-            <div>${whyNot(q, a.input)} The rope caught you — keep climbing.</div>`}
+      <div class="card r-card enter ${kind}" style="--delay:${delay}s">
+        <div class="banner ${kind}">
+          <div class="banner-icon">${iconFor(a)}</div>
+          <div class="banner-text">
+            <div class="banner-title">${hit ? h.title : a.timeout ? "Time's up!" : "Slip!"}</div>
+            <div class="banner-sub">${hit ? `${h.name} · +${h.m} m` : "+0 m · the rope caught you"}</div>
+          </div>
+          ${a.tier === 3 ? `<div class="banner-sparkles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>` : ""}
         </div>
-        <details class="holds">
-          <summary>See every hold on this move</summary>
-          ${holdList(q, hit ? a.display : null)}
-        </details>
-        <button class="btn wide" id="nextBtn">${last ? "See your climb" : "Next move →"}</button>
+        <div class="r-body">
+          <div class="eyebrow">Move ${i + 1} of ${MOVES}</div>
+          <p class="r-q">${esc(q.q)}</p>
+          ${hit ? `
+            <div class="r-answer">${esc(a.display)}</div>
+            ${a.fuzzy ? `<div class="r-note">We read “${esc(a.input)}” as ${esc(a.display)}.</div>` : ""}
+            <p class="r-blurb">${h.blurb}</p>
+            ${meter(a.tier)}`
+          : a.timeout ? `
+            <p class="r-blurb">${a.input ? `You were typing “${esc(a.input)}” when the clock ran out.` : "The clock ran out before you grabbed a hold."} Keep climbing!</p>`
+          : `
+            <div class="r-answer struck">${esc(a.input)}</div>
+            <p class="r-blurb">${whyNot(q, a.input)}</p>`}
+          <details class="holds">
+            <summary>See every hold on this move</summary>
+            <div class="hold-list">${holdList(q, hit ? a.display : null)}</div>
+          </details>
+          <button class="btn wide" id="nextBtn">${last ? "See your climb" : "Next move"} <span aria-hidden="true">→</span></button>
+        </div>
       </div>`;
     document.getElementById("nextBtn").addEventListener("click", () => { viewing = null; render(); });
   }
 
-  function rankFor(m) { return RANKS.filter(([min]) => m >= min).pop()[1]; }
-
-  function shareText() {
-    const m = height();
-    return `CRUX #${day + 1} 🧗 ${crag[0]}\n${state.answers.map((a) => a.tier >= 0 ? HOLDS[a.tier].emoji : SLIP.emoji).join("")}\n${m.toLocaleString()} m · ${rankFor(m)}\n${location.origin + location.pathname}`;
+  function badge(m) {
+    const pct = Math.round((m / MAX_M) * 100);
+    return `<svg class="badge" viewBox="0 0 160 160" aria-hidden="true">
+      <defs><linearGradient id="badgeG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--accent-2)"/><stop offset="1" stop-color="var(--accent)"/></linearGradient></defs>
+      <circle cx="80" cy="80" r="74" class="badge-track"/>
+      <circle cx="80" cy="80" r="74" class="badge-arc" pathLength="100" style="--pct:${pct}" transform="rotate(-90 80 80)"/>
+      <circle cx="80" cy="80" r="62" fill="url(#badgeG)"/>
+      <circle cx="80" cy="80" r="55" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1.2" stroke-dasharray="1.5 4"/>
+      <path d="M58 64 L70 46 L76 54 L82 46 L102 64 Z" fill="#fff" opacity=".95"/>
+      <path d="M70 46 L73 51 L70 53 L67 51 Z" fill="var(--accent)" opacity=".5"/>
+      <text x="80" y="94" text-anchor="middle" class="badge-num">${m.toLocaleString()}</text>
+      <text x="80" y="111" text-anchor="middle" class="badge-unit">METERS</text>
+    </svg>`;
   }
 
   function renderSummary() {
     const m = height();
+    const counts = [0, 0, 0, 0], slips = state.answers.filter((a) => a.tier < 0).length;
+    state.answers.forEach((a) => { if (a.tier >= 0) counts[a.tier]++; });
     play.innerHTML = `
-      <div class="card summary">
-        <div class="move">Route #${day + 1} complete${isToday ? "" : " (practice)"}</div>
+      <div class="card summary enter">
+        <div class="sum-head">
+          <span class="eyebrow">Route #${day + 1} · ${esc(crag.name)}</span>
+          ${isToday ? `<span class="tag">Sent</span>` : `<span class="tag ghosty">Practice</span>`}
+        </div>
+        <div class="badge-wrap">${badge(m)}</div>
         <div class="rank">${rankFor(m)}</div>
-        <div class="total">You climbed <b>${m.toLocaleString()} m</b> of ${MAX_M.toLocaleString()} m</div>
-        <ul class="route-list">
-          ${state.answers.map((a, i) => `
-            <li>
-              <span class="dot ${a.tier >= 0 ? "g" + a.tier : "gx"}"></span>
-              <span class="q">${esc(QUESTIONS[qIds[i]].q)}</span>
-              <span class="a">${a.timeout ? "⏱ out of time" : esc(a.tier >= 0 ? a.display : a.input)}</span>
-            </li>`).join("")}
-        </ul>
+        <div class="rank-sub">${m >= MAX_M ? "You topped out — a perfect climb!" : `${(MAX_M - m).toLocaleString()} m short of the summit`}</div>
+        <div class="strip" aria-label="Your route">${state.answers.map((a, i) => `<div class="cell ${a.tier >= 0 ? "t" + a.tier : "tx"}" style="--i:${i}">${iconFor(a)}</div>`).join("")}</div>
+        <div class="counts">
+          ${HOLDS.map((h, t) => `<div class="count t${t}">${FX.holdIcon(t, "hold-icon sm")}<b>×${counts[t]}</b><span>${h.name}</span></div>`).join("")}
+        </div>
+        <details class="holds moves">
+          <summary>Your moves${slips ? ` · ${slips} slip${slips > 1 ? "s" : ""}` : ""}</summary>
+          <ul class="route-list">
+            ${state.answers.map((a, i) => `
+              <li>
+                ${iconFor(a).replace('class="hold-icon"', 'class="hold-icon xs"')}
+                <span class="q">${esc(QUESTIONS[qIds[i]].q)}</span>
+                <span class="a ${a.tier < 0 ? "miss" : ""}">${a.timeout ? "out of time" : esc(a.tier >= 0 ? a.display : a.input)}</span>
+              </li>`).join("")}
+          </ul>
+        </details>
         <div class="share-row">
           <button class="btn" id="shareBtn">Share result</button>
           <button class="btn ghost" id="reviewBtn">Review moves</button>
         </div>
-        ${isToday ? `<div class="next">Next route in <b id="countdown"></b></div>` : `<div class="next"><a href="${location.pathname}">Back to today's route</a></div>`}
+        ${isToday ? `<div class="next">Next route in <b id="countdown"></b></div>` : `<div class="next"><a href="${location.pathname}">Back to today's route →</a></div>`}
       </div>`;
     document.getElementById("shareBtn").addEventListener("click", share);
     document.getElementById("reviewBtn").addEventListener("click", () => { viewing = 0; renderReview(); });
     if (isToday) tick();
+    if (celebrate) {
+      celebrate = false;
+      if (m >= MAX_M) { FX.flash("#fff", 600); Scene.stamp("Summit!", "t3"); FX.confetti({ count: 220 }); }
+      else if (m >= 1400) FX.confetti({ count: m >= 2200 ? 170 : 90 });
+    }
   }
 
   function renderReview() {
-    renderResult(viewing);
+    renderResult(viewing, false);
     const btn = document.getElementById("nextBtn");
-    btn.textContent = viewing < MOVES - 1 ? "Next move →" : "Back to summary";
+    btn.innerHTML = viewing < MOVES - 1 ? `Next move <span aria-hidden="true">→</span>` : "Back to summary";
     btn.replaceWith(btn.cloneNode(true));
     document.getElementById("nextBtn").addEventListener("click", () => {
       if (viewing < MOVES - 1) { viewing++; renderReview(); } else { viewing = null; render(); }
     });
   }
 
+  function shareText() {
+    const m = height();
+    return `CRUX #${day + 1} 🧗 ${crag.name}\n${state.answers.map((a) => a.tier >= 0 ? HOLDS[a.tier].emoji : SLIP.emoji).join("")}\n${m.toLocaleString()} m · ${rankFor(m)}\n${location.origin + location.pathname}`;
+  }
   async function share() {
     const text = shareText();
     try {
@@ -392,14 +410,12 @@
       toast("Copied! Paste it in the family chat.");
     } catch { toast("Couldn't share — try again."); }
   }
-
   function toast(msg) {
     const t = document.createElement("div");
     t.className = "toast"; t.textContent = msg;
     document.body.appendChild(t);
-    setTimeout(() => t.remove(), 2200);
+    setTimeout(() => t.remove(), 2400);
   }
-
   function tick() {
     const out = document.getElementById("countdown");
     if (!out) return;
@@ -423,19 +439,32 @@
   }
   function showStats() {
     const s = store.get("crux-stats", null);
-    document.getElementById("stats").textContent = s
-      ? `streak ${s.lastDay >= today - 1 ? s.streak : 0} · best ${s.best.toLocaleString()} m`
-      : "your first climb!";
+    const streak = s && s.lastDay >= today - 1 ? s.streak : 0;
+    document.getElementById("streakNum").textContent = streak;
+    document.getElementById("streak").classList.toggle("lit", streak > 0);
+    document.getElementById("stats").textContent = s ? `Best climb ${s.best.toLocaleString()} m · ${s.played} route${s.played === 1 ? "" : "s"} climbed` : "Your first climb!";
   }
 
   // ---------- boot ----------
+  const fmt = (v, pos, neg) => `${Math.abs(v).toFixed(1)}° ${v >= 0 ? pos : neg}`;
   document.getElementById("crag").innerHTML = `
-    <div><span class="where">Today's crag</span><b>${esc(crag[0])}</b><span class="where">${esc(crag[1])}</span></div>
-    <div class="num">Route #${day + 1}</div>`;
+    <div class="sign-main">
+      <div class="eyebrow"><svg viewBox="0 0 24 24" class="pin" aria-hidden="true"><path d="M12 22s7-6.6 7-12a7 7 0 1 0-14 0c0 5.4 7 12 7 12Z"/><circle cx="12" cy="10" r="2.6"/></svg>Today's crag</div>
+      <div class="sign-name">${esc(crag.name)}</div>
+      <div class="sign-where">${esc(crag.where)}</div>
+      <div class="sign-meta"><span class="pill">${esc(crag.rock)}</span><span class="coords">${fmt(crag.lat, "N", "S")} · ${fmt(crag.lon, "E", "W")}</span></div>
+    </div>
+    <div class="sign-route"><span>Route</span><b>#${day + 1}</b></div>`;
+  document.querySelectorAll("[data-hold]").forEach((n) => { n.innerHTML = FX.holdIcon(Number(n.dataset.hold)); });
+  FX.topo();
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => FX.topo());
+  Scene.init({
+    svg: document.getElementById("wall"), wrap: document.getElementById("sceneWrap"),
+    stamp: document.getElementById("stamp"), crag, maxM: MAX_M, seed: day + 1,
+  });
   const help = document.getElementById("help");
   document.getElementById("helpBtn").addEventListener("click", () => help.showModal());
   if (!store.get("crux-seen-help", false)) { store.set("crux-seen-help", true); help.showModal(); }
-  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => drawWall(false));
   showStats();
   render();
 })();
