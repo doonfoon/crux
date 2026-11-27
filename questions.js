@@ -412,8 +412,6 @@ const QUESTIONS = [
         ["Georgia", "Maryland", "Connecticut", "Delaware"],
         ["Rhode Island", "New Hampshire"]] },
 
-  { q: "Name one of the Four Corners states (the 4 US states that meet at a single point).",
-    a: [["Arizona", "Colorado"], ["Utah"], ["New Mexico"], []] },
 
   { q: "Name one of the four countries that make up the United Kingdom.",
     a: [["England", "Scotland"], ["Wales"], [["Northern Ireland", "N Ireland", "Ulster"]], []] },
@@ -708,16 +706,6 @@ QUESTIONS.push(
         ["Boise", "Lansing", "Madison", ["Saint Paul", "St. Paul"], "Harrisburg", "Trenton", "Hartford", "Providence", "Annapolis", "Carson City",
          "Cheyenne", "Helena", "Lincoln", "Topeka", "Montgomery", "Jackson", "Columbia", "Olympia", "Salem"],
         ["Bismarck", "Pierre", "Montpelier", "Concord", "Augusta", "Dover", "Frankfort", "Jefferson City", "Charleston"]] },
-  { cat: "city", map: "points", q: "Name a city that has hosted the Summer Olympics.",
-    a: [["London", "Paris", "Tokyo", "Beijing", "Los Angeles", ["Rio de Janeiro", "Rio"]],
-        ["Sydney", "Athens", "Barcelona", "Atlanta", "Moscow", "Seoul", "Berlin", "Rome"],
-        ["Montreal", "Munich", "Mexico City", "Melbourne", "Amsterdam", "Stockholm"],
-        ["Helsinki", "Antwerp", ["St. Louis", "Saint Louis"]]] },
-  { cat: "city", map: "points", q: "Name a city or town that has hosted the Winter Olympics.",
-    a: [["Vancouver", "Salt Lake City", "Lake Placid", "Sochi", "Beijing"],
-        ["Calgary", "Nagano", ["Turin", "Torino"], "Lillehammer", "Innsbruck", "Pyeongchang", "Sarajevo"],
-        ["Sapporo", "Grenoble", "Albertville", "Oslo", ["St. Moritz", "Saint Moritz"], ["Milan", "Milano"], ["Cortina d'Ampezzo", "Cortina"]],
-        ["Chamonix", ["Garmisch-Partenkirchen", "Garmisch"], ["Squaw Valley", "Palisades Tahoe"]]] },
   { cat: "city", map: "points", q: "Name a city on the Danube River (the long river that flows through Vienna).",
     a: [["Vienna", "Budapest"], ["Belgrade", "Bratislava"], ["Linz", "Passau", "Regensburg", "Ulm", "Novi Sad"],
         ["Ingolstadt", "Ruse", ["Galati", "Galați"], "Vukovar", "Krems", "Esztergom", "Vidin", "Izmail", "Braila", "Donaueschingen"]] },
@@ -807,7 +795,6 @@ const CAT_FIX = {
   "Name an Australian state or territory.": [null, "none"],
   "Name one of the four countries that make up the United Kingdom.": [null, "none"],
   "Name a New England state.": [null, "us"],
-  "Name one of the Four Corners states (the 4 US states that meet at a single point).": [null, "us"],
 };
 const NATURE_RX = /\b(River|Lake|Sea|Ocean|oceans|Gulf|Alps|Andes|Himalayas|Sahara|Amazon|Mekong|Rhine|Danube|Nile|coastline|shoreline|Coast)\b/;
 QUESTIONS.forEach((q) => {
