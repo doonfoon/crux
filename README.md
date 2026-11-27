@@ -1,15 +1,15 @@
 # CRUX — daily geography climb 🧗
 
-A daily geography trivia game. Every day there's a new 7-question route; each question has many right
+A daily geography trivia game with a 30-second clock per question. Every day there's a new 7-question route; each question has many right
 answers, and **rarer right answers are harder holds that climb you higher**.
 
-| Hold  | Grade | Height |
-|-------|-------|--------|
-| Jug   | 5.7   | +100 m |
-| Edge  | 5.10  | +200 m |
-| Crimp | 5.12  | +300 m |
-| Mono  | 5.14  | +400 m |
-| Slip  | —     | +0 m   |
+| Hold      | Height |
+|-----------|--------|
+| Jug       | +100 m |
+| Sloper    | +200 m |
+| Crimp     | +300 m |
+| Foot Chip | +400 m |
+| Slip / out of time | +0 m |
 
 ## Files
 - `index.html` – the page
@@ -19,7 +19,7 @@ answers, and **rarer right answers are harder holds that climb you higher**.
 
 ## Adding a question
 Copy one of the blocks in `questions.js`. Put each right answer in one of the four lists
-(Jug, Edge, Crimp, Mono). Every question needs all four lists, even if one is empty `[]`.
+(Jug, Sloper, Crimp, Foot Chip). Every question needs all four lists, even if one is empty `[]`.
 
 ## Testing an old route
 Add `?route=3` to the address to replay route #3 (it won't count toward your streak).

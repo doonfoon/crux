@@ -1,8 +1,8 @@
 // CRUX question bank.
 // Each question lists every accepted answer, sorted into 4 "holds" by how
 // well known the answer is:
-//   0 = Jug (easy, most people say it)   1 = Edge
-//   2 = Crimp (uncommon)                 3 = Mono (very rare)
+//   0 = Jug (easy, most people say it)   1 = Sloper
+//   2 = Crimp (uncommon)                 3 = Foot Chip (very rare)
 // An answer can be a string or an array of [Display name, ...other accepted spellings].
 
 const QUESTIONS = [
@@ -590,7 +590,7 @@ const CRAGS = [
 
 // Every other country / US state name, so a real-but-wrong place (e.g. "Gambia")
 // is never "auto-corrected" into a right answer (e.g. "Zambia").
-const KNOWN_PLACES = (
+const KNOWN_COUNTRIES = (
   "Afghanistan,Albania,Algeria,Andorra,Angola,Antigua and Barbuda,Argentina,Armenia,Australia,Austria," +
   "Azerbaijan,Bahamas,Bahrain,Bangladesh,Barbados,Belarus,Belgium,Belize,Benin,Bhutan,Bolivia," +
   "Bosnia and Herzegovina,Botswana,Brazil,Brunei,Bulgaria,Burkina Faso,Burundi,Cambodia,Cameroon,Canada," +
@@ -609,10 +609,13 @@ const KNOWN_PLACES = (
   "Solomon Islands,Somalia,South Africa,South Korea,South Sudan,Spain,Sri Lanka,Sudan,Suriname,Sweden," +
   "Switzerland,Syria,Taiwan,Tajikistan,Tanzania,Thailand,Togo,Tonga,Trinidad and Tobago,Tunisia,Turkey," +
   "Turkmenistan,Tuvalu,Uganda,Ukraine,United Arab Emirates,United Kingdom,United States,Uruguay,Uzbekistan," +
-  "Vanuatu,Vatican City,Venezuela,Vietnam,Yemen,Zambia,Zimbabwe,Democratic Republic of the Congo," +
+  "Vanuatu,Vatican City,Venezuela,Vietnam,Yemen,Zambia,Zimbabwe,Democratic Republic of the Congo,Western Sahara"
+).split(",");
+const KNOWN_STATES = (
   "Alabama,Alaska,Arizona,Arkansas,California,Colorado,Connecticut,Delaware,Florida,Georgia,Hawaii,Idaho," +
   "Illinois,Indiana,Iowa,Kansas,Kentucky,Louisiana,Maine,Maryland,Massachusetts,Michigan,Minnesota," +
   "Mississippi,Missouri,Montana,Nebraska,Nevada,New Hampshire,New Jersey,New Mexico,New York," +
   "North Carolina,North Dakota,Ohio,Oklahoma,Oregon,Pennsylvania,Rhode Island,South Carolina,South Dakota," +
   "Tennessee,Texas,Utah,Vermont,Virginia,Washington,West Virginia,Wisconsin,Wyoming"
 ).split(",");
+const KNOWN_PLACES = KNOWN_COUNTRIES.concat(KNOWN_STATES);

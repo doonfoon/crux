@@ -1,11 +1,12 @@
 // CRUX — daily geography climb.
 (() => {
   const MOVES = 7;
+  const SECONDS = 30; // time allowed per question
   const HOLDS = [
-    { name: "Jug", grade: "5.7", m: 100, emoji: "🟩", blurb: "A solid, popular answer." },
-    { name: "Edge", grade: "5.10", m: 200, emoji: "🟦", blurb: "Nice — a step off the beaten path." },
-    { name: "Crimp", grade: "5.12", m: 300, emoji: "🟧", blurb: "Not many climbers find this one." },
-    { name: "Mono", grade: "5.14", m: 400, emoji: "🟪", blurb: "A deep cut! Almost nobody gets this." },
+    { name: "Jug", m: 100, emoji: "🟩", blurb: "A big, friendly hold — a solid, popular answer." },
+    { name: "Sloper", m: 200, emoji: "🟦", blurb: "Nice — a step off the beaten path." },
+    { name: "Crimp", m: 300, emoji: "🟧", blurb: "Not many climbers find this one." },
+    { name: "Foot Chip", m: 400, emoji: "🟪", blurb: "A tiny hold almost nobody spots — what a deep cut!" },
   ];
   const SLIP = { name: "Slip", emoji: "⬛" };
   const MAX_M = MOVES * HOLDS[3].m;
@@ -195,38 +196,114 @@
     renderQuestion();
   }
 
+  let timer = null;
+
   function renderQuestion() {
     const i = state.answers.length;
     const q = QUESTIONS[qIds[i]];
+    // The clock keeps running through a page refresh, so reloading can't buy extra time.
+    if (!state.clock || state.clock.i !== i) { state.clock = { i, start: Date.now() }; store.set(stateKey, state); }
+    const deadline = state.clock.start + SECONDS * 1000;
     play.innerHTML = `
       <div class="card">
-        <div class="move">Move ${i + 1} of ${MOVES}</div>
+        <div class="move-row">
+          <div class="move">Move ${i + 1} of ${MOVES}</div>
+          <div class="clock" id="clock"><span id="clockNum">${SECONDS}</span>s</div>
+        </div>
+        <div class="timebar"><div class="timefill" id="timefill"></div></div>
         <div class="question">${esc(q.q)}</div>
         <form class="answer-row" id="answerForm" autocomplete="off">
           <input id="answer" type="text" placeholder="Your answer…" autocapitalize="words" spellcheck="false" aria-label="Your answer">
           <button class="btn" type="submit">Climb</button>
         </form>
-        <div class="hint">One try. Rarer right answers climb higher.</div>
+        <div class="hint">One try, ${SECONDS} seconds. Rarer right answers climb higher.</div>
       </div>`;
     const input = document.getElementById("answer");
     if (matchMedia("(hover: hover)").matches) input.focus();
-    document.getElementById("answerForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const raw = input.value.trim();
-      if (!raw) return input.focus();
-      const r = judge(q, raw);
-      state.answers.push({ input: raw, display: r.display || raw, tier: r.tier, fuzzy: !!r.fuzzy });
+
+    const finish = (raw, timedOut) => {
+      clearInterval(timer); timer = null;
+      const r = timedOut ? { tier: -1 } : judge(q, raw);
+      state.answers.push({ input: raw, display: r.display || raw, tier: r.tier, fuzzy: !!r.fuzzy, timeout: timedOut });
+      delete state.clock;
       store.set(stateKey, state);
       if (state.answers.length === MOVES) recordStats();
       viewing = state.answers.length - 1;
       render(r.tier < 0);
+    };
+
+    const fill = document.getElementById("timefill"), num = document.getElementById("clockNum"), clock = document.getElementById("clock");
+    const tickClock = () => {
+      const left = Math.max(0, deadline - Date.now());
+      const secs = Math.ceil(left / 1000);
+      num.textContent = secs;
+      fill.style.width = `${(left / (SECONDS * 1000)) * 100}%`;
+      clock.classList.toggle("urgent", secs <= 10);
+      fill.classList.toggle("urgent", secs <= 10);
+      if (left <= 0) finish(input.value.trim(), true);
+    };
+    clearInterval(timer);
+    timer = setInterval(tickClock, 200);
+    tickClock();
+
+    document.getElementById("answerForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const raw = input.value.trim();
+      if (!raw) return input.focus();
+      finish(raw, false);
     });
+  }
+
+  // ---------- "why didn't that land?" notes ----------
+  const COUNTRY_SET = new Set(KNOWN_COUNTRIES.map(norm));
+  const STATE_SET = new Set(KNOWN_STATES.map(norm));
+  const plural = (s) => /(alps|andes|himalayas|mountains)$/i.test(s);
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+  function whyNot(q, input) {
+    const n = ALIAS[norm(input)] || norm(input);
+    const name = esc(input);
+    const text = esc(q.q.replace(/\s*\([^)]*\)/g, "").replace(/\s+\.$/, "."));
+    const wantsState = /US state/.test(text), wantsCountry = /\bcountr(y|ies)\b/.test(text);
+    const isCountry = COUNTRY_SET.has(n), isState = STATE_SET.has(n);
+    if (!isCountry && !isState) {
+      return `We couldn't find “${name}” among the right answers. Check the spelling — or it may just not fit this one.`;
+    }
+    if (wantsState && isCountry && !isState) return `${name} is a country — this one wanted a US state!`;
+    if (wantsCountry && isState && !isCountry) return `${name} is a US state — this one wanted a country!`;
+
+    const a = (w) => (/^[aeiou]/i.test(w) ? "an " : "a ") + w;
+    let m;
+    if ((m = text.match(/with exactly one other country/))) return `${name} has more than one neighbor.`;
+    if ((m = text.match(/(?:borders|shares a land border with) (.+?)\.$/))) return `${name} doesn't share a border with ${m[1]}.`;
+    if ((m = text.match(/that the (.+?) touches\.$/))) return `The ${m[1]} doesn't touch ${name}.`;
+    if ((m = text.match(/touches (.+?)\.$/))) return `${name} doesn't touch ${m[1]}.`;
+    if ((m = text.match(/(?:coastline|shoreline) on (.+?)\.$/))) return `${name} doesn't have a coastline on ${m[1]}.`;
+    if ((m = text.match(/with an? (.+?) coastline\.$/))) return `${name} doesn't have ${a(m[1])} coastline.`;
+    if ((m = text.match(/Name an? .+? (?:the )?(.+?) (passes|flows|extends?|runs?)( through or borders| through| into)\.$/))) {
+      const subj = "The " + m[1].replace(/^the /i, "");
+      const verb = { passes: "pass", flows: "flow", extends: "extend", runs: "run" }[m[2]] || m[2];
+      const rest = m[3].replace(" or borders", " or border");
+      return plural(m[1]) ? `${subj} don't ${verb}${rest} ${name}.` : `${subj} doesn't ${verb}${rest} ${name}.`;
+    }
+    if ((m = text.match(/where (.+?) is an official language/))) return `${m[1]} isn't an official language of ${name}.`;
+    if ((m = text.match(/member country of (.+?)\.$/))) return `${name} isn't a member of ${m[1]}.`;
+    if ((m = text.match(/starts with the letter (\w)/))) return `${name} doesn't start with ${m[1]}.`;
+    if ((m = text.match(/with more than (.+?)\.$/))) return `${name} doesn't have more than ${m[1]}.`;
+    if ((m = text.match(/has hosted (.+?)\.$/))) return `${name} hasn't hosted ${m[1]}.`;
+    if ((m = text.match(/that has a monarch/))) return `${name} doesn't have a monarch.`;
+    if ((m = text.match(/was one of (.+?)\.$/))) return `${name} wasn't one of ${m[1]}.`;
+    if ((m = text.match(/on the (.+?)\.$/))) return `${name} isn't on the ${m[1]}.`;
+    if ((m = text.match(/^Name one of (.+?)\.$/))) return `${name} isn't one of ${m[1]}.`;
+    if ((m = text.match(/^Name an? (.+?) in (.+?)\.$/))) return `${name} isn't ${a(m[1])} in ${m[2]}.`;
+    if ((m = text.match(/^Name an? (.+?)\.$/))) return `${name} isn't ${a(m[1])}.`;
+    return `${name} is a real place, but it isn't one of the right answers here.`;
   }
 
   function holdList(q, you) {
     return q.a.map((group, t) => group.length ? `
       <div class="hold-group">
-        <div class="label"><span class="dot g${t}"></span>${HOLDS[t].name} · ${HOLDS[t].grade}</div>
+        <div class="label"><span class="dot g${t}"></span>${HOLDS[t].name} · +${HOLDS[t].m} m</div>
         <div class="names">${group.map((a) => {
           const name = Array.isArray(a) ? a[0] : a;
           return name === you ? `<span class="you">${esc(name)}</span>` : esc(name);
@@ -246,11 +323,14 @@
         <div class="question">${esc(q.q)}</div>
         <div class="result ${hit ? "hit" : "miss"}">
           ${hit ? `
-            <div class="big"><span class="dot g${a.tier}"></span> ${h.name} · ${h.grade} &nbsp;+${h.m} m</div>
+            <div class="big"><span class="dot g${a.tier}"></span> ${h.name} &nbsp;+${h.m} m</div>
             <div>${esc(a.display)}${a.fuzzy ? ` <span class="sub">(we read “${esc(a.input)}” as ${esc(a.display)})</span>` : ""} — ${h.blurb}</div>`
+          : a.timeout ? `
+            <div class="big">⏱ Time's up! +0 m</div>
+            <div>${a.input ? `You were typing “${esc(a.input)}” when the clock ran out.` : "The clock ran out."} The rope caught you — keep climbing.</div>`
           : `
             <div class="big">Slip! +0 m</div>
-            <div>“${esc(a.input)}” isn't on this route. The rope caught you — keep climbing.</div>`}
+            <div>${whyNot(q, a.input)} The rope caught you — keep climbing.</div>`}
         </div>
         <details class="holds">
           <summary>See every hold on this move</summary>
@@ -280,7 +360,7 @@
             <li>
               <span class="dot ${a.tier >= 0 ? "g" + a.tier : "gx"}"></span>
               <span class="q">${esc(QUESTIONS[qIds[i]].q)}</span>
-              <span class="a">${esc(a.tier >= 0 ? a.display : a.input)}</span>
+              <span class="a">${a.timeout ? "⏱ out of time" : esc(a.tier >= 0 ? a.display : a.input)}</span>
             </li>`).join("")}
         </ul>
         <div class="share-row">
