@@ -17,11 +17,15 @@ answers, and **rarer right answers are harder holds that climb you higher**.
 - `game.js` – the game logic and screens
 - `scene.js` – the illustrated climbing wall and the move animations
 - `fx.js` – confetti, sparks, chalk puffs and the hold drawings
+- `map.js` – the map reveal after each move
+- `geo.js` – map coordinates for cities, mountains, lakes and tiny countries
 - `questions.js` – **the question bank** (edit this to add questions or change how rare an answer is)
 
 ## Adding a question
 Copy one of the blocks in `questions.js`. Put each right answer in one of the four lists
 (Jug, Sloper, Crimp, Foot Chip). Every question needs all four lists, even if one is empty `[]`.
+Give it a `cat` of `"flag"`, `"nature"` or `"city"` so the daily mix stays varied, and for city/landmark
+answers add their coordinates to `geo.js` so they show up on the map.
 
 ## Testing an old route
 Add `?route=3` to the address to replay route #3 (it won't count toward your streak).

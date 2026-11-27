@@ -404,6 +404,53 @@ dialog p b { color: var(--ink); }
 }
 @keyframes toast { 0% { opacity: 0; transform: translate(-50%, 16px); } 10%, 85% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; } }
 
+/* ---------- map reveal ---------- */
+:root { --map-sea: #d9e8f2; --map-land: #efe7d8; --map-edge: #cbbda5; --map-grat: rgba(40, 70, 110, .08); }
+@media (prefers-color-scheme: dark) { :root { --map-sea: #121c2c; --map-land: #262d3c; --map-edge: #3a4253; --map-grat: rgba(255, 255, 255, .05); } }
+.map-box { margin-top: 14px; }
+.map-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; min-height: 18px; }
+.map-label { font-weight: 700; font-size: 14px; text-align: right; }
+.map-frame { position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: var(--map-sea); aspect-ratio: 360 / 200; }
+.map-frame.loading .map-shimmer {
+  position: absolute; inset: 0;
+  background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--card) 60%, transparent) 50%, transparent 70%) 0 0 / 200% 100%;
+  animation: shimmer 1.2s linear infinite;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+.map-svg { display: block; width: 100%; height: auto; }
+.map-sea { fill: var(--map-sea); }
+.map-grat { fill: none; stroke: var(--map-grat); stroke-width: .6; }
+.map-land path { fill: var(--map-land); stroke: var(--map-edge); stroke-width: .5; stroke-linejoin: round; }
+.map-hits .hit {
+  fill: var(--c); stroke: color-mix(in srgb, var(--c) 60%, #000); stroke-width: .6; cursor: pointer;
+  animation: mapin .55s cubic-bezier(.2, 1.2, .4, 1) both; animation-delay: calc(var(--delay, 0s) + var(--d));
+}
+.map-hits .hit.you { stroke: var(--ink); stroke-width: 1.6; }
+.map-hits .hit:hover { filter: brightness(1.12); }
+@keyframes mapin { from { opacity: 0; } to { opacity: 1; } }
+.map-hits .dot { cursor: pointer; animation: dotin .5s cubic-bezier(.2, 1.6, .4, 1) both; animation-delay: calc(var(--delay, 0s) + var(--d)); }
+.map-hits .dot-core { fill: var(--c); stroke: #fff; stroke-width: 1.2; }
+.map-hits .dot-ring { fill: none; stroke: var(--ink); stroke-width: 1.4; transform-box: fill-box; transform-origin: center; animation: ring 1.8s ease-out infinite; }
+@keyframes dotin { from { opacity: 0; scale: 0; } to { opacity: 1; scale: 1; } }
+@keyframes ring { 0% { scale: .6; opacity: 1; } 100% { scale: 1.6; opacity: 0; } }
+.map-legend { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 8px; font: 500 11px var(--mono); color: var(--ink-2); }
+.map-legend span { display: flex; align-items: center; gap: 5px; }
+.map-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.map-legend .leg-you i { background: none; border: 2px solid var(--ink); border-radius: 50%; width: 11px; height: 11px; }
+
+/* ---------- crag fun facts ---------- */
+.sign-fact { margin-top: 10px; position: relative; z-index: 1; }
+.sign-fact summary {
+  list-style: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+  font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--accent-2);
+}
+.sign-fact summary::-webkit-details-marker { display: none; }
+.sign-fact summary::before { content: "✦"; }
+.sign-fact[open] summary::before { content: "✧"; }
+.sign-fact p { margin: 6px 0 0; font-size: 14px; line-height: 1.45; opacity: .9; animation: rise .35s ease both; }
+.crag-fact { margin-top: 16px; padding: 12px 14px; border-radius: 14px; background: var(--card-2); text-align: left; border-left: 4px solid var(--accent); }
+.crag-fact p { margin: 6px 0 0; color: var(--ink-2); font-size: 14px; }
+
 /* wide screens: wall on the left, the climb on the right */
 @media (min-width: 900px) {
   .app {

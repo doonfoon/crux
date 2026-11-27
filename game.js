@@ -38,14 +38,19 @@
     for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
     return a;
   }
-  // Walk through the bank in shuffled cycles so every question is used before any repeats.
+  // Each kind of question has its own pool, walked in shuffled cycles so nothing repeats until the pool runs out.
+  const POOLS = { flag: [], nature: [], city: [], other: [] };
+  QUESTIONS.forEach((q, i) => (POOLS[q.cat] || POOLS.other).push(i));
+  const cyc = (pool, k, salt) => shuffled(pool, salt + Math.floor(k / pool.length))[k % pool.length];
   function questionsForDay(d) {
-    const n = QUESTIONS.length, picked = [];
+    const r = rng(5000 + d), picked = [];
+    // Most days (not all) get a flag, a nature and a city question for variety.
+    [["flag", 101], ["nature", 202], ["city", 303]].forEach(([c, salt]) => { if (r() < 0.8) picked.push(cyc(POOLS[c], d, salt)); });
     for (let k = d * MOVES; picked.length < MOVES; k++) {
-      const q = shuffled(QUESTIONS.map((_, i) => i), 9001 + Math.floor(k / n))[k % n];
+      const q = cyc(POOLS.other, k, 404);
       if (!picked.includes(q)) picked.push(q);
     }
-    return picked;
+    return shuffled(picked, 777 + d);
   }
   const qIds = questionsForDay(day);
   const crag = CRAGS[((day % CRAGS.length) + CRAGS.length) % CRAGS.length];
@@ -56,6 +61,11 @@
     .replace(/^the /, "");
   const ALIAS = Object.fromEntries(Object.entries(ALIASES).map(([k, v]) => [norm(k), norm(v)]));
   const KNOWN = new Set(KNOWN_PLACES.map(norm));
+  const GEO_N = Object.fromEntries(Object.entries(GEO).map(([k, v]) => [norm(k), v]));
+  // "Lake Victoria" = "Victoria", "Mount Everest" = "Everest", "Sahara Desert" = "Sahara"…
+  const PRE = /^(lake|mount|mt|mont|river|sea of|the) /;
+  const SUF = / (river|desert|ocean|sea|lake|mountains|mountain range|range|falls|fall|waterfall|island|city|peak|massif)$/;
+  const core = (s) => { let p; do { p = s; s = s.replace(PRE, "").replace(SUF, ""); } while (s !== p && s); return s || p; };
 
   function lev(a, b) {
     if (Math.abs(a.length - b.length) > 2) return 9;
@@ -88,11 +98,14 @@
     const exact = list.find((e) => e.keys.includes(n)) || list.find((e) => e.keys.includes(ALIAS[n]));
     n = ALIAS[n] || n;
     if (exact) return { ...exact, fuzzy: false };
+    const c = core(n);
+    const loose = list.find((e) => e.keys.some((k) => core(k) === c));
+    if (loose) return { ...loose, fuzzy: false };
     if (KNOWN.has(n)) return { tier: -1 }; // a real place, just not on this route
     let best = null, bestD = 99;
     for (const e of list) for (const k of e.keys) {
       const limit = k.length >= 9 ? 2 : k.length >= 5 ? 1 : 0;
-      const d = lev(n, k);
+      const d = Math.min(lev(n, k), lev(c, core(k)));
       if (d <= limit && d < bestD) { best = e; bestD = d; }
     }
     return best ? { ...best, fuzzy: true } : { tier: -1 };
@@ -109,14 +122,14 @@
     const name = esc(input);
     const text = esc(q.q.replace(/\s*\([^)]*\)/g, "").replace(/\s+\.$/, "."));
     const wantsState = /US state/.test(text), wantsCountry = /\bcountr(y|ies)\b/.test(text);
-    const isCountry = COUNTRY_SET.has(n), isState = STATE_SET.has(n);
-    if (!isCountry && !isState) {
+    const isCountry = COUNTRY_SET.has(n), isState = STATE_SET.has(n), isPlace = !!GEO_N[n];
+    if (!isCountry && !isState && !isPlace) {
       return `We couldn't find “${name}” among the right answers. Check the spelling — or it may just not fit this one.`;
     }
     if (wantsState && isCountry && !isState) return `${name} is a country — this one wanted a US state!`;
     if (wantsCountry && isState && !isCountry) return `${name} is a US state — this one wanted a country!`;
 
-    const a = (w) => (/^[aeiou]/i.test(w) ? "an " : "a ") + w;
+    const a = (w) => (/^(eu|uni|us\b|use|one)/i.test(w) ? "a " : /^[aeiou]/i.test(w) ? "an " : "a ") + w;
     let m;
     if ((m = text.match(/with exactly one other country/))) return `${name} has more than one neighbor.`;
     if ((m = text.match(/(?:borders|shares a land border with) (.+?)\.$/))) return `${name} doesn't share a border with ${m[1]}.`;
@@ -319,6 +332,7 @@
           : `
             <div class="r-answer struck">${esc(a.input)}</div>
             <p class="r-blurb">${whyNot(q, a.input)}</p>`}
+          ${mapMode(q) !== "none" ? `<div class="map-box" id="mapBox"></div>` : ""}
           <details class="holds">
             <summary>See every hold on this move</summary>
             <div class="hold-list">${holdList(q, hit ? a.display : null)}</div>
@@ -327,6 +341,14 @@
         </div>
       </div>`;
     document.getElementById("nextBtn").addEventListener("click", () => { viewing = null; render(); });
+    const mapBox = document.getElementById("mapBox");
+    if (mapBox) MapReveal.render(mapBox, { entries: entries(q), mode: mapMode(q), you: hit ? a.display : null, norm, geo: GEO_N });
+  }
+
+  function mapMode(q) {
+    if (q.map === "none") return "none";
+    if (/US state/.test(q.q)) return "us";
+    return q.map || "world";
   }
 
   function badge(m) {
@@ -372,6 +394,7 @@
               </li>`).join("")}
           </ul>
         </details>
+        ${crag.fact ? `<div class="crag-fact"><span class="eyebrow">About ${esc(crag.name)}</span><p>${esc(crag.fact)}</p></div>` : ""}
         <div class="share-row">
           <button class="btn" id="shareBtn">Share result</button>
           <button class="btn ghost" id="reviewBtn">Review moves</button>
@@ -453,6 +476,7 @@
       <div class="sign-name">${esc(crag.name)}</div>
       <div class="sign-where">${esc(crag.where)}</div>
       <div class="sign-meta"><span class="pill">${esc(crag.rock)}</span><span class="coords">${fmt(crag.lat, "N", "S")} · ${fmt(crag.lon, "E", "W")}</span></div>
+      ${crag.fact ? `<details class="sign-fact"><summary>Fun fact</summary><p>${esc(crag.fact)}</p></details>` : ""}
     </div>
     <div class="sign-route"><span>Route</span><b>#${day + 1}</b></div>`;
   document.querySelectorAll("[data-hold]").forEach((n) => { n.innerHTML = FX.holdIcon(Number(n.dataset.hold)); });
@@ -467,4 +491,5 @@
   if (!store.get("crux-seen-help", false)) { store.set("crux-seen-help", true); help.showModal(); }
   showStats();
   render();
+  MapReveal.warm();
 })();
