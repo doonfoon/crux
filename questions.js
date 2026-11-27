@@ -816,6 +816,15 @@ QUESTIONS.forEach((q) => {
   if (!q.cat) q.cat = NATURE_RX.test(q.q) ? "nature" : "other";
 });
 
+// Every question gets at least one Foot Chip, so a perfect 2,800 m climb is always possible:
+// if a question has none, its rarest answer is promoted.
+QUESTIONS.forEach((q) => {
+  if (q.a[3].length) return;
+  for (let t = 2; t >= 0; t--) {
+    if (q.a[t].length > (t === 0 ? 1 : 0)) { q.a[3].push(q.a[t].pop()); break; }
+  }
+});
+
 // Different spellings that mean the same place. Keys and values are compared
 // after normalising (lowercase, no accents, no punctuation).
 const ALIASES = {

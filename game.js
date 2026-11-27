@@ -67,19 +67,20 @@
   const SUF = / (river|desert|ocean|sea|lake|mountains|mountain range|range|falls|fall|waterfall|island|city|peak|massif)$/;
   const core = (s) => { let p; do { p = s; s = s.replace(PRE, "").replace(SUF, ""); } while (s !== p && s); return s || p; };
 
+  // Typo distance: letters added, missing, changed, or two letters swapped ("Purtugal") each count as one.
   function lev(a, b) {
-    if (Math.abs(a.length - b.length) > 2) return 9;
-    const dp = Array.from({ length: b.length + 1 }, (_, j) => j);
-    for (let i = 1; i <= a.length; i++) {
-      let prev = dp[0]; dp[0] = i;
-      for (let j = 1; j <= b.length; j++) {
-        const tmp = dp[j];
-        dp[j] = Math.min(dp[j] + 1, dp[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
-        prev = tmp;
-      }
+    if (Math.abs(a.length - b.length) > 3) return 9;
+    const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+    for (let j = 1; j <= b.length; j++) d[0][j] = j;
+    for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
     }
-    return dp[b.length];
+    return d[a.length][b.length];
   }
+  // How many typos a name of this length can have and still count.
+  const typoLimit = (len) => (len <= 3 ? 0 : len <= 5 ? 1 : len <= 9 ? 2 : 3);
 
   function entries(q) {
     const out = [];
@@ -101,10 +102,11 @@
     const c = core(n);
     const loose = list.find((e) => e.keys.some((k) => core(k) === c));
     if (loose) return { ...loose, fuzzy: false };
-    if (KNOWN.has(n)) return { tier: -1 }; // a real place, just not on this route
+    // A real place that just isn't on this route — don't "auto-correct" it into a right answer.
+    if (KNOWN.has(n) || (q.map === "points" && GEO_N[n])) return { tier: -1 };
     let best = null, bestD = 99;
     for (const e of list) for (const k of e.keys) {
-      const limit = k.length >= 9 ? 2 : k.length >= 5 ? 1 : 0;
+      const limit = typoLimit(k.length);
       const d = Math.min(lev(n, k), lev(c, core(k)));
       if (d <= limit && d < bestD) { best = e; bestD = d; }
     }
