@@ -6,7 +6,7 @@
     { name: "Jug", m: 100, emoji: "🟩", title: "Clean grab!", blurb: "A big, friendly hold — a solid, popular answer.", delay: 0.5 },
     { name: "Sloper", m: 200, emoji: "🟦", title: "Smooth move!", blurb: "Nice — a step off the beaten path.", delay: 0.75 },
     { name: "Crimp", m: 300, emoji: "🟧", title: "Crimped it!", blurb: "Not many climbers find this one.", delay: 0.95 },
-    { name: "Foot Chip", m: 400, emoji: "🟪", title: "Deep cut!", blurb: "A tiny hold almost nobody spots. Legendary.", delay: 1.9 },
+    { name: "Foot Chip", m: 400, emoji: "🟪", title: "Crux move!", blurb: "A tiny hold almost nobody spots. Legendary.", delay: 1.9 },
   ];
   const SLIP = { emoji: "⬛" };
   const MAX_M = MOVES * HOLDS[3].m;

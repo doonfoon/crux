@@ -448,7 +448,7 @@
           FX.burst(s.x, s.y, { count: 46, colors: ["#ffd76a", "#c46bff", "#ffffff", "#a855f7"], shapes: ["star", "star", "circle"], speed: [120, 380], g: 220, size: [5, 11], life: [0.8, 1.5] });
           setTimeout(() => FX.confetti({ colors: ["#a855f7", "#c46bff", "#ffc53d", "#ffd76a", "#ffffff", "#ff5a36"] }), 120);
           this.shake(7);
-          this.stamp("Deep cut!", "t3");
+          this.stamp("Crux move!", "t3");
           FX.vibrate([40, 60, 90]);
           break;
       }
